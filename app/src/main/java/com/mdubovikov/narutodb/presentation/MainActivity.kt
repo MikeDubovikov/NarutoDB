@@ -1,10 +1,10 @@
-package com.mdubovikov.narutodb
+package com.mdubovikov.narutodb.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.mdubovikov.narutodb.ui.theme.NarutoDBTheme
+import com.mdubovikov.narutodb.presentation.ui.theme.NarutoDBTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

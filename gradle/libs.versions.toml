@@ -12,11 +12,12 @@ junitVersion = "1.2.1"
 kotlin = "1.9.24"
 ksp = "1.9.24-1.0.20"
 lifecycleRuntimeKtx = "2.8.4"
-mvikotlin = "4.1.0"
+mvikotlin = "4.2.0"
 okhttp = "4.12.0"
 paging = "3.3.2"
 retrofit = "2.11.0"
 room = "2.6.1"
+serialization-json = "1.6.3"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -44,12 +45,14 @@ mvikotlin-extensions-coroutines = { group = "com.arkivanov.mvikotlin", name = "m
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 paging = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+retrofit-converter = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 room-core = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization-json" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
