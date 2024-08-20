@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ItemCard(
-    val id: String,
+    val id: Int,
     val name: String,
     val image: String
 ) : Parcelable

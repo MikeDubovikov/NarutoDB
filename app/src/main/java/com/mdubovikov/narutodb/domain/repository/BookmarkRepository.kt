@@ -7,7 +7,7 @@ interface BookmarkRepository {
 
     val bookmarkedItems: Flow<List<ItemCard>>
 
-    fun observeIsBookmarks(itemId: Int): Boolean
+    fun observeIsBookmarks(itemId: Int): Flow<Boolean>
 
     suspend fun addToBookmarks(item: ItemCard)
 
