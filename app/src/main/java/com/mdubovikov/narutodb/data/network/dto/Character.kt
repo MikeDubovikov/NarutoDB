@@ -1,8 +1,9 @@
 package com.mdubovikov.narutodb.data.network.dto
 
+import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonOccupationSerializer
+import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonPartnerSerializer
 import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonReturnEmptyObjectPersonal
 import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonReturnEmptyObjectRank
-import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonStringOrListSerializer
 import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonStringToListSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -34,9 +35,9 @@ data class PersonalDto(
     val classification: List<String>? = null,
     @Serializable(TransformJsonStringToListSerializer::class)
     val affiliation: List<String>? = null,
-    @Serializable(TransformJsonStringOrListSerializer::class)
+    @Serializable(TransformJsonOccupationSerializer::class)
     val occupation: List<String>? = null,
-    @Serializable(TransformJsonStringOrListSerializer::class)
+    @Serializable(TransformJsonPartnerSerializer::class)
     val partner: List<String>? = null,
     @Serializable(TransformJsonStringToListSerializer::class)
     val team: List<String>? = null,

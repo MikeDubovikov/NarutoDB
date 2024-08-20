@@ -34,7 +34,7 @@ object TransformJsonReturnEmptyObjectPersonal :
     }
 }
 
-object TransformJsonStringOrListSerializer :
+object TransformJsonOccupationSerializer :
     JsonTransformingSerializer<List<String>>(ListSerializer(String.serializer())) {
     override fun transformDeserialize(element: JsonElement) =
         when (element) {
@@ -54,7 +54,32 @@ object TransformJsonStringOrListSerializer :
             }
 
             else -> throw IllegalArgumentException(
-                "Invalid JSON format"
+                "Invalid JSON format for occupation"
+            )
+        }
+}
+
+object TransformJsonPartnerSerializer :
+    JsonTransformingSerializer<List<String>>(ListSerializer(String.serializer())) {
+    override fun transformDeserialize(element: JsonElement) =
+        when (element) {
+            is JsonArray -> element
+            is JsonObject -> JsonArray(
+                listOf(
+                    element.getValue("partner")
+                )
+            )
+
+            is JsonPrimitive -> {
+                JsonArray(
+                    listOf(
+                        element
+                    )
+                )
+            }
+
+            else -> throw IllegalArgumentException(
+                "Invalid JSON format for partner"
             )
         }
 }
