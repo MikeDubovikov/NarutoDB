@@ -1,6 +1,5 @@
-package com.mdubovikov.narutodb.ui.theme
+package com.mdubovikov.narutodb.presentation.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

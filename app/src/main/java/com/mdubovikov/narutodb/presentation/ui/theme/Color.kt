@@ -1,4 +1,4 @@
-package com.mdubovikov.narutodb.ui.theme
+package com.mdubovikov.narutodb.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
