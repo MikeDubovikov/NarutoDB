@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.parcelize)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -70,12 +71,13 @@ dependencies {
     implementation(libs.dagger.core)
     ksp(libs.dagger.compiler)
     implementation(libs.retrofit.core)
-    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.paging)
     implementation(libs.coil.compose)
     implementation(libs.room.core)
     ksp(libs.room.compiler)
+    implementation(libs.serialization.json)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
