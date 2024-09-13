@@ -3,8 +3,8 @@ package com.mdubovikov.narutodb.domain.usecase
 import com.mdubovikov.narutodb.domain.repository.BookmarksRepository
 import javax.inject.Inject
 
-class ObserveBookmarkStateUseCase @Inject constructor(
+class GetBookmarksUseCase @Inject constructor(
     private val repository: BookmarksRepository
 ) {
-    operator fun invoke(itemId: Int) = repository.observeIsBookmark(itemId)
+    operator fun invoke() = repository.bookmarks
 }
