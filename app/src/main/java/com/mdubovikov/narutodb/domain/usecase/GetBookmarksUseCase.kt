@@ -6,5 +6,6 @@ import javax.inject.Inject
 class GetBookmarksUseCase @Inject constructor(
     private val repository: BookmarksRepository
 ) {
+
     operator fun invoke() = repository.bookmarks
 }

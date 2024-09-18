@@ -8,5 +8,16 @@ import javax.inject.Inject
 
 class CategoryRepositoryImpl @Inject constructor() : CategoryRepository {
 
-    override val categories: Flow<List<Category>> = flowOf()
+    override val categories: Flow<List<Category>> = flowOf(
+        listOf(
+            Category(0, "Characters", ""),
+            Category(1, "Akatsuki", ""),
+            Category(2, "Tailed Beasts", ""),
+            Category(3, "Kara", ""),
+            Category(4, "Kekkei Genkai", ""),
+            Category(5, "Teams", ""),
+            Category(6, "Clans", ""),
+            Category(7, "Villages", "")
+        )
+    )
 }

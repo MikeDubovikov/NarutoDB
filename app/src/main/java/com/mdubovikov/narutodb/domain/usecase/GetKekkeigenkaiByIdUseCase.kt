@@ -1,13 +1,12 @@
 package com.mdubovikov.narutodb.domain.usecase
 
-import com.mdubovikov.narutodb.domain.repository.KekkeigenkaiRepository
+import com.mdubovikov.narutodb.domain.repository.SearchRepository
 import javax.inject.Inject
 
 class GetKekkeigenkaiByIdUseCase @Inject constructor(
-    private val repository: KekkeigenkaiRepository
+    private val repository: SearchRepository
 ) {
 
     suspend operator fun invoke(kekkeigenkaiId: Int) =
-        repository.getKekkeigenkaiById(kekkeigenkaiId)
-
+        repository.searchKekkeigenkaiById(kekkeigenkaiId)
 }

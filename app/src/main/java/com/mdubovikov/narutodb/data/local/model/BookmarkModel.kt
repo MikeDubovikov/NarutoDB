@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class BookmarkModel(
     @PrimaryKey val id: Int,
     val name: String,
-    val image: String
+    val image: String,
+    val isBookmarked: Boolean
 )

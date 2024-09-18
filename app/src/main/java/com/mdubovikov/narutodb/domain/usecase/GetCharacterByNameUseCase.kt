@@ -1,18 +1,21 @@
 package com.mdubovikov.narutodb.domain.usecase
 
-import com.mdubovikov.narutodb.domain.repository.CharacterRepository
+import com.mdubovikov.narutodb.domain.repository.SearchRepository
 import javax.inject.Inject
 
 class GetCharacterByNameUseCase @Inject constructor(
-    private val repository: CharacterRepository
+    private val repository: SearchRepository
 ) {
 
-    suspend fun getCharacterByName(name: String) = repository.getCharacterByName(name)
+    suspend fun getCharacterByName(characterName: String) =
+        repository.searchCharacterByName(characterName)
 
-    suspend fun getKaraByName(name: String) = repository.getKaraByName(name)
+    suspend fun getKaraByName(karaName: String) =
+        repository.searchCharacterByName(karaName)
 
-    suspend fun getTailedBeastByName(name: String) = repository.getTailedBeastByName(name)
+    suspend fun getTailedBeastByName(tailedBeastName: String) =
+        repository.searchCharacterByName(tailedBeastName)
 
-    suspend fun getAkatsukiByName(name: String) = repository.getAkatsukiByName(name)
-
+    suspend fun getAkatsukiByName(akatsukiName: String) =
+        repository.searchCharacterByName(akatsukiName)
 }

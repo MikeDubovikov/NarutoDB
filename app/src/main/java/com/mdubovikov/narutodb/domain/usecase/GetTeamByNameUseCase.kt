@@ -1,12 +1,11 @@
 package com.mdubovikov.narutodb.domain.usecase
 
-import com.mdubovikov.narutodb.domain.repository.TeamRepository
+import com.mdubovikov.narutodb.domain.repository.SearchRepository
 import javax.inject.Inject
 
 class GetTeamByNameUseCase @Inject constructor(
-    private val repository: TeamRepository
+    private val repository: SearchRepository
 ) {
 
-    suspend operator fun invoke(name: String) = repository.getTeamByName(name)
-
+    suspend operator fun invoke(name: String) = repository.searchTeamByName(name)
 }

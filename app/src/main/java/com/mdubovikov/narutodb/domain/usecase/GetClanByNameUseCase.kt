@@ -1,12 +1,11 @@
 package com.mdubovikov.narutodb.domain.usecase
 
-import com.mdubovikov.narutodb.domain.repository.ClanRepository
+import com.mdubovikov.narutodb.domain.repository.SearchRepository
 import javax.inject.Inject
 
 class GetClanByNameUseCase @Inject constructor(
-    private val repository: ClanRepository
+    private val repository: SearchRepository
 ) {
 
-    suspend operator fun invoke(name: String) = repository.getClanByName(name)
-
+    suspend operator fun invoke(name: String) = repository.searchClanByName(name)
 }

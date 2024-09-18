@@ -8,8 +8,9 @@ class ChangeBookmarkStatusUseCase @Inject constructor(
     private val repository: BookmarksRepository
 ) {
 
-    suspend fun addToBookmarks(itemOfCategory: ItemOfCategory) = repository.addToBookmarks(itemOfCategory)
+    suspend fun addToBookmarks(itemOfCategory: ItemOfCategory) =
+        repository.addToBookmarks(itemOfCategory)
 
-    suspend fun removeFromBookmarks(itemId: Int) = repository.removeFromBookmarks(itemId)
-
+    suspend fun removeFromBookmarks(itemId: Int) =
+        repository.removeFromBookmarks(itemId)
 }
