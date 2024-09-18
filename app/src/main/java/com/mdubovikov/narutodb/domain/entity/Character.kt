@@ -37,6 +37,5 @@ data class Character(
     val grandfather: String?,
     val spouse: String?,
     val depoweredform: String?,
-    val incarnationWithTheGodtree: String?,
-    val isBookmarked: Boolean
+    val incarnationWithTheGodtree: String?
 )
