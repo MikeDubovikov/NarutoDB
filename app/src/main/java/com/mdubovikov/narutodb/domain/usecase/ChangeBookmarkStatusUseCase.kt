@@ -1,15 +1,16 @@
 package com.mdubovikov.narutodb.domain.usecase
 
-import com.mdubovikov.narutodb.domain.entity.ItemCard
-import com.mdubovikov.narutodb.domain.repository.BookmarkRepository
+import com.mdubovikov.narutodb.domain.entity.ItemOfCategory
+import com.mdubovikov.narutodb.domain.repository.BookmarksRepository
 import javax.inject.Inject
 
 class ChangeBookmarkStatusUseCase @Inject constructor(
-    private val repository: BookmarkRepository
+    private val repository: BookmarksRepository
 ) {
 
-    suspend fun addToBookmarks(item: ItemCard) = repository.addToBookmarks(item)
+    suspend fun addToBookmarks(itemOfCategory: ItemOfCategory) =
+        repository.addToBookmarks(itemOfCategory)
 
-    suspend fun removeFromBookmarks(itemId: Int) = repository.removeFromBookmarks(itemId)
-
+    suspend fun removeFromBookmarks(itemId: Int) =
+        repository.removeFromBookmarks(itemId)
 }
