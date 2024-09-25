@@ -10,6 +10,7 @@ import com.arkivanov.decompose.value.Value
 import com.mdubovikov.narutodb.domain.entity.Category
 import com.mdubovikov.narutodb.domain.entity.ItemOfCategory
 import com.mdubovikov.narutodb.presentation.categories.DefaultCategoriesComponent
+import com.mdubovikov.narutodb.presentation.characters.DefaultCharactersComponent
 import com.mdubovikov.narutodb.presentation.details.DefaultDetailsComponent
 import com.mdubovikov.narutodb.presentation.items_of_category.DefaultItemsOfCategoryComponent
 import dagger.assisted.Assisted
@@ -19,7 +20,7 @@ import kotlinx.serialization.Serializable
 
 class DefaultRootComponent @AssistedInject constructor(
     private val categoriesComponentFactory: DefaultCategoriesComponent.Factory,
-    private val itemsOfCategoryComponentFactory: DefaultItemsOfCategoryComponent.Factory,
+    private val charactersComponentFactory: DefaultCharactersComponent.Factory,
     private val detailsComponentFactory: DefaultDetailsComponent.Factory,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : RootComponent, ComponentContext by componentContext {
@@ -43,27 +44,28 @@ class DefaultRootComponent @AssistedInject constructor(
                 val component = categoriesComponentFactory.create(
                     onCategoryClick = { category ->
                         navigation.push(Config.ItemOfCategories(category = category))
+                    onCharactersClicked = {
+                        navigation.push(Config.Characters)
                     },
                     componentContext = componentContext
                 )
                 RootComponent.Child.Categories(component)
             }
 
-            is Config.ItemOfCategories -> {
-                val component = itemsOfCategoryComponentFactory.create(
-                    category = config.category,
-                    onItemOfCategoryClick = { itemOfCategory ->
-                        navigation.push(Config.Details(itemOfCategory))
+            Config.Characters -> {
+                val component = charactersComponentFactory.create(
+                    onCharacterClicked = { character ->
+                        navigation.push(Config.Details(character))
                     },
                     onBackClicked = { navigation.pop() },
                     componentContext = componentContext
                 )
-                RootComponent.Child.ItemsOfCategory(component)
+                RootComponent.Child.Characters(component)
             }
 
             is Config.Details -> {
                 val component = detailsComponentFactory.create(
-                    itemOfCategory = config.itemOfCategory,
+                    character = config.character,
                     onBackClicked = {
                         navigation.pop()
                     },
@@ -81,10 +83,11 @@ class DefaultRootComponent @AssistedInject constructor(
         data object Categories : Config
 
         @Serializable
-        data class ItemOfCategories(val category: Category) : Config
+        data object Characters : Config
 
         @Serializable
         data class Details(val itemOfCategory: ItemOfCategory) : Config
+        data class Details(val character: Character) : Config
     }
 
     @AssistedFactory
