@@ -7,12 +7,11 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
-import com.mdubovikov.narutodb.domain.entity.Category
-import com.mdubovikov.narutodb.domain.entity.ItemOfCategory
+import com.mdubovikov.narutodb.domain.entity.Character
+import com.mdubovikov.narutodb.presentation.bookmarks.DefaultBookmarksComponent
 import com.mdubovikov.narutodb.presentation.categories.DefaultCategoriesComponent
 import com.mdubovikov.narutodb.presentation.characters.DefaultCharactersComponent
 import com.mdubovikov.narutodb.presentation.details.DefaultDetailsComponent
-import com.mdubovikov.narutodb.presentation.items_of_category.DefaultItemsOfCategoryComponent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -22,6 +21,7 @@ class DefaultRootComponent @AssistedInject constructor(
     private val categoriesComponentFactory: DefaultCategoriesComponent.Factory,
     private val charactersComponentFactory: DefaultCharactersComponent.Factory,
     private val detailsComponentFactory: DefaultDetailsComponent.Factory,
+    private val bookmarksComponentFactory: DefaultBookmarksComponent.Factory,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : RootComponent, ComponentContext by componentContext {
 
@@ -42,10 +42,14 @@ class DefaultRootComponent @AssistedInject constructor(
         return when (config) {
             Config.Categories -> {
                 val component = categoriesComponentFactory.create(
-                    onCategoryClick = { category ->
-                        navigation.push(Config.ItemOfCategories(category = category))
                     onCharactersClicked = {
                         navigation.push(Config.Characters)
+                    },
+                    onBookmarksClicked = {
+                        navigation.push(Config.Bookmarks)
+                    },
+                    onChangeThemeClicked = {
+
                     },
                     componentContext = componentContext
                 )
@@ -73,6 +77,19 @@ class DefaultRootComponent @AssistedInject constructor(
                 )
                 RootComponent.Child.Details(component)
             }
+
+            Config.Bookmarks -> {
+                val component = bookmarksComponentFactory.create(
+                    onBookmarkClicked = {
+                        navigation.push(Config.Details(it))
+                    },
+                    onBackClicked = {
+                        navigation.pop()
+                    },
+                    componentContext = componentContext
+                )
+                RootComponent.Child.Bookmarks(component)
+            }
         }
     }
 
@@ -86,8 +103,10 @@ class DefaultRootComponent @AssistedInject constructor(
         data object Characters : Config
 
         @Serializable
-        data class Details(val itemOfCategory: ItemOfCategory) : Config
         data class Details(val character: Character) : Config
+
+        @Serializable
+        data object Bookmarks : Config
     }
 
     @AssistedFactory
