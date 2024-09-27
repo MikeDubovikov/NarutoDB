@@ -53,3 +53,11 @@ fun CharacterDto.toCharacter(): Character =
     )
 
 fun List<CharacterDto>.toCharactersList() = map { it.toCharacter() }
+
+fun CharacterDetails.toCharacter(): Character =
+    Character(
+        id = id,
+        name = name ?: "",
+        image = images?.first() ?: "",
+        isBookmarked = false
+    )

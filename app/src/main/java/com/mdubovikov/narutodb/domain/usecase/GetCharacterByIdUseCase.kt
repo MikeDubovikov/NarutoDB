@@ -9,14 +9,4 @@ class GetCharacterByIdUseCase @Inject constructor(
 
     suspend fun getCharacterById(characterId: Int) =
         repository.searchCharacterById(characterId)
-
-    suspend fun getKaraById(karaId: Int) =
-        repository.searchCharacterById(karaId)
-
-    suspend fun getTailedBeastById(tailedBeastId: Int) =
-        repository.searchCharacterById(tailedBeastId)
-
-    suspend fun getAkatsukiById(akatsukiId: Int) =
-        repository.searchCharacterById(akatsukiId)
-
 }

@@ -33,46 +33,16 @@ interface ApiService {
         @Query("limit") limit: Int
     ): KaraResponse
 
-    @GET("kara/{id}")
-    suspend fun getKaraById(
-        @Path("id") id: Int
-    ): CharacterDto
-
-    @GET("kara/search")
-    suspend fun getKaraByName(
-        @Query("name") name: String
-    ): CharacterDto
-
     @GET("tailed-beast")
     suspend fun getAllTailedBeasts(
         @Query("page") page: Int,
         @Query("limit") limit: Int
     ): TailedBeastResponse
 
-    @GET("tailed-beast/{id}")
-    suspend fun getTailedBeastById(
-        @Path("id") id: Int
-    ): CharacterDto
-
-    @GET("tailed-beast/search")
-    suspend fun getTailedBeastByName(
-        @Query("name") name: String
-    ): CharacterDto
-
     @GET("akatsuki")
     suspend fun getAllAkatsuki(
         @Query("page") page: Int,
         @Query("limit") limit: Int
     ): AkatsukiResponse
-
-    @GET("akatsuki/{id}")
-    suspend fun getAkatsukiById(
-        @Path("id") id: Int
-    ): CharacterDto
-
-    @GET("akatsuki/search")
-    suspend fun getAkatsukiByName(
-        @Query("name") name: String
-    ): CharacterDto
 
 }
