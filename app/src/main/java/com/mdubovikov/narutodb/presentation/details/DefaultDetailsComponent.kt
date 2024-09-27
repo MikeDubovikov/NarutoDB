@@ -4,7 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
-import com.mdubovikov.narutodb.domain.entity.ItemOfCategory
+import com.mdubovikov.narutodb.domain.entity.Character
 import com.mdubovikov.narutodb.presentation.extension.componentScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -15,12 +15,12 @@ import kotlinx.coroutines.launch
 
 class DefaultDetailsComponent @AssistedInject constructor(
     private val storeFactory: DetailsStoreFactory,
-    @Assisted("itemOfCategory") private val itemOfCategory: ItemOfCategory,
+    @Assisted("character") private val character: Character,
     @Assisted("onBackClicked") private val onBackClicked: () -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : DetailsComponent, ComponentContext by componentContext {
 
-    private val store = instanceKeeper.getStore { storeFactory.create(itemOfCategory) }
+    private val store = instanceKeeper.getStore { storeFactory.create(character) }
     private val scope = componentScope()
 
     init {
@@ -50,7 +50,7 @@ class DefaultDetailsComponent @AssistedInject constructor(
     interface Factory {
 
         fun create(
-            @Assisted("itemOfCategory") itemOfCategory: ItemOfCategory,
+            @Assisted("character") character: Character,
             @Assisted("onBackClicked") onBackClicked: () -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext
         ): DefaultDetailsComponent

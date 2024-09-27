@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
+import com.mdubovikov.narutodb.domain.entity.Category
 import com.mdubovikov.narutodb.domain.entity.Character
 import com.mdubovikov.narutodb.presentation.extension.componentScope
 import dagger.assisted.Assisted
@@ -15,12 +16,13 @@ import kotlinx.coroutines.launch
 
 class DefaultBookmarksComponent @AssistedInject constructor(
     private val storeFactory: BookmarksStoreFactory,
+    @Assisted("category") private val category: Category,
     @Assisted("onBackClicked") private val onBackClicked: () -> Unit,
     @Assisted("onBookmarkClicked") private val onBookmarkClicked: (Character) -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : BookmarksComponent, ComponentContext by componentContext {
 
-    private val store = instanceKeeper.getStore { storeFactory.create() }
+    private val store = instanceKeeper.getStore { storeFactory.create(category) }
     private val scope = componentScope()
 
     init {
@@ -55,6 +57,7 @@ class DefaultBookmarksComponent @AssistedInject constructor(
     interface Factory {
 
         fun create(
+            @Assisted("category") category: Category,
             @Assisted("onBackClicked") onBackClicked: () -> Unit,
             @Assisted("onBookmarkClicked") onBookmarkClicked: (Character) -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext
