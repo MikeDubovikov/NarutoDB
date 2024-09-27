@@ -7,6 +7,12 @@ interface CharactersComponent {
 
     val model: StateFlow<CharactersStore.State>
 
+    fun changeSearchQuery(query: String)
+
+    fun onSearchClick()
+
+    fun changeCharacterOption(option: CharacterOptions)
+
     fun onCharacterClick(character: Character)
 
     fun onClickBack()
