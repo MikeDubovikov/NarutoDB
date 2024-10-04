@@ -48,7 +48,7 @@ fun CharacterDto.toCharacter(): Character =
     Character(
         id = id,
         name = name ?: "",
-        image = images?.first() ?: "",
+        image = images?.firstOrNull() ?: "",
         isBookmarked = false
     )
 
@@ -58,6 +58,6 @@ fun CharacterDetails.toCharacter(): Character =
     Character(
         id = id,
         name = name ?: "",
-        image = images?.first() ?: "",
+        image = images?.firstOrNull() ?: "",
         isBookmarked = false
     )

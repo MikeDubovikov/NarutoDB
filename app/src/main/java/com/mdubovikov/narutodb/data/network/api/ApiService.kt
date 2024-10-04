@@ -5,6 +5,7 @@ import com.mdubovikov.narutodb.data.network.dto.CharacterDto
 import com.mdubovikov.narutodb.data.network.dto.CharacterResponse
 import com.mdubovikov.narutodb.data.network.dto.KaraResponse
 import com.mdubovikov.narutodb.data.network.dto.TailedBeastResponse
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -15,7 +16,7 @@ interface ApiService {
     suspend fun getAllCharacters(
         @Query("page") page: Int,
         @Query("limit") limit: Int
-    ): CharacterResponse
+    ): Response<CharacterResponse>
 
     @GET("character/{id}")
     suspend fun getCharacterById(
@@ -31,18 +32,18 @@ interface ApiService {
     suspend fun getAllKara(
         @Query("page") page: Int,
         @Query("limit") limit: Int
-    ): KaraResponse
+    ): Response<KaraResponse>
 
     @GET("tailed-beast")
     suspend fun getAllTailedBeasts(
         @Query("page") page: Int,
         @Query("limit") limit: Int
-    ): TailedBeastResponse
+    ): Response<TailedBeastResponse>
 
     @GET("akatsuki")
     suspend fun getAllAkatsuki(
         @Query("page") page: Int,
         @Query("limit") limit: Int
-    ): AkatsukiResponse
+    ): Response<AkatsukiResponse>
 
 }
