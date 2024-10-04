@@ -1,28 +1,37 @@
 package com.mdubovikov.narutodb.data.repository
 
-import com.mdubovikov.narutodb.data.mapper.toCharactersList
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.mdubovikov.narutodb.data.network.CharactersPageSource
 import com.mdubovikov.narutodb.data.network.api.ApiService
 import com.mdubovikov.narutodb.domain.entity.Character
 import com.mdubovikov.narutodb.domain.repository.CharactersRepository
+import com.mdubovikov.narutodb.presentation.characters.CharacterOptions
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class CharactersRepositoryImpl @Inject constructor(
     private val apiService: ApiService
 ) : CharactersRepository {
 
-    override suspend fun getAllCharacters(page: Int, limit: Int): List<Character> {
-        return apiService.getAllCharacters(page, limit).characters.toCharactersList()
-    }
+    override suspend fun getAllCharacters(): Flow<PagingData<Character>> = Pager(
+        config = PagingConfig(pageSize = 10),
+        pagingSourceFactory = { CharactersPageSource(apiService, CharacterOptions.AllCharacters) }
+    ).flow
 
-    override suspend fun getAllAkatsuki(page: Int, limit: Int): List<Character> {
-        return apiService.getAllAkatsuki(page, limit).akatsuki.toCharactersList()
-    }
+    override suspend fun getAllAkatsuki(): Flow<PagingData<Character>> = Pager(
+        config = PagingConfig(pageSize = 10),
+        pagingSourceFactory = { CharactersPageSource(apiService, CharacterOptions.AllAkatsuki) }
+    ).flow
 
-    override suspend fun getAllTailedBeasts(page: Int, limit: Int): List<Character> {
-        return apiService.getAllTailedBeasts(page, limit).tailedBeasts.toCharactersList()
-    }
+    override suspend fun getAllTailedBeasts(): Flow<PagingData<Character>> = Pager(
+        config = PagingConfig(pageSize = 10),
+        pagingSourceFactory = { CharactersPageSource(apiService, CharacterOptions.AllTailedBeasts) }
+    ).flow
 
-    override suspend fun getAllKara(page: Int, limit: Int): List<Character> {
-        return apiService.getAllKara(page, limit).kara.toCharactersList()
-    }
+    override suspend fun getAllKara(): Flow<PagingData<Character>> = Pager(
+        config = PagingConfig(pageSize = 10),
+        pagingSourceFactory = { CharactersPageSource(apiService, CharacterOptions.AllKara) }
+    ).flow
 }
