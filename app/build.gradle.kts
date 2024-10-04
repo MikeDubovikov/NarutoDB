@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.room.core)
     ksp(libs.room.compiler)
     implementation(libs.serialization.json)
+    implementation(libs.datastore)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
