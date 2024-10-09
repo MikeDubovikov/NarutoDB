@@ -2,9 +2,9 @@ package com.mdubovikov.narutodb.data.mapper
 
 import com.mdubovikov.narutodb.data.network.dto.CharacterDto
 import com.mdubovikov.narutodb.domain.entity.Character
-import com.mdubovikov.narutodb.domain.entity.ItemOfCategory
+import com.mdubovikov.narutodb.domain.entity.CharacterDetails
 
-fun CharacterDto.toEntity(): Character = Character(
+fun CharacterDto.toCharacterDetails(): CharacterDetails = CharacterDetails(
     id = id,
     name = name,
     images = images,
@@ -44,13 +44,20 @@ fun CharacterDto.toEntity(): Character = Character(
     incarnationWithTheGodtree = family?.incarnationWithTheGodtree
 )
 
-fun CharacterDto.toItemOfCategory(): ItemOfCategory = ItemOfCategory(
-    id = id,
-    name = name ?: "",
-    image = images?.first() ?: "",
-    isBookmarked = false
-)
+fun CharacterDto.toCharacter(): Character =
+    Character(
+        id = id,
+        name = name ?: "",
+        image = images?.firstOrNull() ?: "",
+        isBookmarked = false
+    )
 
-fun List<CharacterDto>.toEntity() = map { it.toEntity() }
+fun List<CharacterDto>.toCharactersList() = map { it.toCharacter() }
 
-fun List<CharacterDto>.toEntityList() = map { it.toItemOfCategory() }
+fun CharacterDetails.toCharacter(): Character =
+    Character(
+        id = id,
+        name = name ?: "",
+        image = images?.firstOrNull() ?: "",
+        isBookmarked = false
+    )

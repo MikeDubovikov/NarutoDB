@@ -6,11 +6,11 @@ import com.mdubovikov.narutodb.data.local.db.BookmarksDatabase
 import com.mdubovikov.narutodb.data.network.api.ApiFactory
 import com.mdubovikov.narutodb.data.network.api.ApiService
 import com.mdubovikov.narutodb.data.repository.BookmarksRepositoryImpl
-import com.mdubovikov.narutodb.data.repository.CategoriesRepositoryImpl
+import com.mdubovikov.narutodb.data.repository.CharactersRepositoryImpl
 import com.mdubovikov.narutodb.data.repository.CategoryRepositoryImpl
 import com.mdubovikov.narutodb.data.repository.SearchRepositoryImpl
 import com.mdubovikov.narutodb.domain.repository.BookmarksRepository
-import com.mdubovikov.narutodb.domain.repository.CategoriesRepository
+import com.mdubovikov.narutodb.domain.repository.CharactersRepository
 import com.mdubovikov.narutodb.domain.repository.CategoryRepository
 import com.mdubovikov.narutodb.domain.repository.SearchRepository
 import dagger.Binds
@@ -27,7 +27,7 @@ interface DataModule {
     fun bindCategoryRepository(impl: CategoryRepositoryImpl): CategoryRepository
 
     @[ApplicationScope Binds]
-    fun bindCharacterRepository(impl: CategoriesRepositoryImpl): CategoriesRepository
+    fun bindCharactersRepository(impl: CharactersRepositoryImpl): CharactersRepository
 
     @[ApplicationScope Binds]
     fun bindSearchRepository(impl: SearchRepositoryImpl): SearchRepository

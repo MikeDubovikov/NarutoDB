@@ -9,13 +9,4 @@ class GetCharacterByNameUseCase @Inject constructor(
 
     suspend fun getCharacterByName(characterName: String) =
         repository.searchCharacterByName(characterName)
-
-    suspend fun getKaraByName(karaName: String) =
-        repository.searchCharacterByName(karaName)
-
-    suspend fun getTailedBeastByName(tailedBeastName: String) =
-        repository.searchCharacterByName(tailedBeastName)
-
-    suspend fun getAkatsukiByName(akatsukiName: String) =
-        repository.searchCharacterByName(akatsukiName)
 }
