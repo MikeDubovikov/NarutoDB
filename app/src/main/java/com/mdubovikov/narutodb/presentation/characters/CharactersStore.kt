@@ -1,5 +1,6 @@
 package com.mdubovikov.narutodb.presentation.characters
 
+import androidx.paging.PagingData
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -13,6 +14,8 @@ import com.mdubovikov.narutodb.domain.usecase.GetCharacterByNameUseCase
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.Intent
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.Label
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.State
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,28 +38,11 @@ interface CharactersStore : Store<Intent, State, Label> {
         val category: Category,
         val searchQuery: String,
         val selectedCharacterOption: CharacterOptions,
-        val charactersState: CharactersState,
-        val searchState: SearchState
-    ) {
-
-        sealed interface CharactersState {
-
-            data object Initial : CharactersState
-
-            data object Loading : CharactersState
-
-            data object Error : CharactersState
-
-            data class Loaded(val charactersList: List<Character>) : CharactersState
-        }
-
-        sealed interface SearchState {
-
-            data object Initial : SearchState
-
-            data object NotFound : SearchState
-        }
-    }
+        val charactersList: Flow<PagingData<Character>>,
+        val isLoading: Boolean,
+        val isError: Boolean,
+        val isNotFound: Boolean
+    )
 
     sealed interface Label {
 
@@ -81,8 +67,10 @@ class CharactersStoreFactory @Inject constructor(
                 category = category,
                 searchQuery = "",
                 selectedCharacterOption = CharacterOptions.AllCharacters,
-                charactersState = State.CharactersState.Initial,
-                searchState = State.SearchState.Initial
+                charactersList = emptyFlow(),
+                isLoading = false,
+                isError = false,
+                isNotFound = false
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
@@ -95,7 +83,7 @@ class CharactersStoreFactory @Inject constructor(
 
         data object CharactersIsError : Action
 
-        data class CharactersLoaded(val characterList: List<Character>) : Action
+        data class CharactersLoaded(val characterList: Flow<PagingData<Character>>) : Action
     }
 
     private sealed interface Msg {
@@ -104,7 +92,7 @@ class CharactersStoreFactory @Inject constructor(
 
         data object CharactersIsError : Msg
 
-        data class CharactersLoaded(val characterList: List<Character>) : Msg
+        data class CharactersLoaded(val characterList: Flow<PagingData<Character>>) : Msg
 
         data class ChangeSearchQuery(val query: String) : Msg
 
@@ -157,11 +145,8 @@ class CharactersStoreFactory @Inject constructor(
                 }
 
                 is Intent.ChangeCharacterOptions -> {
-
                     scope.launch {
-
                         dispatch(Msg.CharactersIsLoading)
-
                         try {
                             when (intent.option) {
                                 CharacterOptions.AllCharacters -> {
@@ -181,7 +166,6 @@ class CharactersStoreFactory @Inject constructor(
                                 }
                             }
                         } catch (e: Exception) {
-
                             dispatch(Msg.CharactersIsError)
                         }
                     }
@@ -210,25 +194,15 @@ class CharactersStoreFactory @Inject constructor(
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State = when (msg) {
 
-            Msg.CharactersIsLoading -> {
-                copy(charactersState = State.CharactersState.Loading)
-            }
+            Msg.CharactersIsLoading -> copy(isLoading = true)
 
-            Msg.CharactersIsError -> {
-                copy(charactersState = State.CharactersState.Error)
-            }
+            Msg.CharactersIsError -> copy(isError = true)
 
-            is Msg.CharactersLoaded -> {
-                copy(charactersState = State.CharactersState.Loaded(msg.characterList))
-            }
+            is Msg.CharactersLoaded -> copy(charactersList = msg.characterList)
 
-            is Msg.ChangeSearchQuery -> {
-                copy(searchQuery = msg.query)
-            }
+            is Msg.ChangeSearchQuery -> copy(searchQuery = msg.query)
 
-            Msg.SearchNotFound -> {
-                copy(searchState = State.SearchState.NotFound)
-            }
+            Msg.SearchNotFound -> copy(isNotFound = true)
         }
     }
 }
