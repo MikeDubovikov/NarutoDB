@@ -16,9 +16,9 @@ import javax.inject.Inject
 interface SearchStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
-        data class ChangeSearchQuery(val query: String) : Intent
         data object ClickBack : Intent
         data object SearchCharacter : Intent
+        data class ChangeSearchQuery(val query: String) : Intent
     }
 
     data class State(
@@ -85,6 +85,8 @@ class SearchStoreFactory @Inject constructor(
 
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State = when (msg) {
+            is Msg.ChangeSearchQuery -> copy(searchQuery = msg.query)
+            Msg.SearchNotFound -> copy(isNotFound = true)
         }
     }
 }

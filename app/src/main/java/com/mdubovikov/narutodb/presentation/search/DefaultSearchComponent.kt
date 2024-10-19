@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class DefaultSearchComponent @AssistedInject constructor(
     private val storeFactory: SearchStoreFactory,
     @Assisted("onBackClicked") private val onBackClicked: () -> Unit,
-    @Assisted("onDetailsRequested") private val onDetailsRequested: (Character) -> Unit,
+    @Assisted("searchCharacter") private val searchCharacter: (Character) -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : SearchComponent, ComponentContext by componentContext {
 
@@ -28,7 +28,7 @@ class DefaultSearchComponent @AssistedInject constructor(
             store.labels.collect {
                 when (it) {
                     is SearchStore.Label.SearchCharacter -> {
-                        onDetailsRequested(it.character)
+                        searchCharacter(it.character)
                     }
 
                     SearchStore.Label.ClickBack -> onBackClicked()
@@ -56,6 +56,7 @@ class DefaultSearchComponent @AssistedInject constructor(
     interface Factory {
         fun create(
             @Assisted("onBackClicked") onBackClicked: () -> Unit,
+            @Assisted("searchCharacter") searchCharacter: (Character) -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext
         ): DefaultSearchComponent
     }
