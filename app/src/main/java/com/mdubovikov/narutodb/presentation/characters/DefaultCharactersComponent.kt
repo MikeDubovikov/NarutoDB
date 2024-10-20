@@ -19,7 +19,7 @@ class DefaultCharactersComponent @AssistedInject constructor(
     @Assisted("category") private val category: Category,
     @Assisted("onCharacterClicked") private val onCharacterClicked: (Character) -> Unit,
     @Assisted("onBackClicked") private val onBackClicked: () -> Unit,
-    @Assisted("onDetailsRequested") private val onDetailsRequested: (Character) -> Unit,
+    @Assisted("onSearchClicked") private val onSearchClicked: () -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : CharactersComponent, ComponentContext by componentContext {
 
@@ -34,12 +34,12 @@ class DefaultCharactersComponent @AssistedInject constructor(
                         onBackClicked()
                     }
 
-                    is CharactersStore.Label.CharacterClick -> {
-                        onCharacterClicked(it.character)
+                    CharactersStore.Label.ClickSearch -> {
+                        onSearchClicked()
                     }
 
-                    is CharactersStore.Label.SearchToDetails -> {
-                        onDetailsRequested(it.character)
+                    is CharactersStore.Label.CharacterClick -> {
+                        onCharacterClicked(it.character)
                     }
                 }
             }
@@ -48,14 +48,6 @@ class DefaultCharactersComponent @AssistedInject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val model: StateFlow<CharactersStore.State> = store.stateFlow
-
-    override fun changeSearchQuery(query: String) {
-        store.accept(CharactersStore.Intent.ChangeSearchQuery(query))
-    }
-
-    override fun onSearchClick() {
-        store.accept(CharactersStore.Intent.ClickSearch)
-    }
 
     override fun changeCharacterOption(option: CharacterOptions) {
         store.accept(CharactersStore.Intent.ChangeCharacterOptions(option))
@@ -69,6 +61,10 @@ class DefaultCharactersComponent @AssistedInject constructor(
         store.accept(CharactersStore.Intent.ClickBack)
     }
 
+    override fun onClickSearch() {
+        store.accept(CharactersStore.Intent.ClickSearch)
+    }
+
     @AssistedFactory
     interface Factory {
 
@@ -76,7 +72,7 @@ class DefaultCharactersComponent @AssistedInject constructor(
             @Assisted("category") category: Category,
             @Assisted("onCharacterClicked") onCharacterClicked: (Character) -> Unit,
             @Assisted("onBackClicked") onBackClicked: () -> Unit,
-            @Assisted("onDetailsRequested") onDetailsRequested: (Character) -> Unit,
+            @Assisted("onSearchClicked") onSearchClicked: () -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext
         ): DefaultCharactersComponent
     }
