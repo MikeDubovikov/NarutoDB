@@ -13,6 +13,7 @@ import com.mdubovikov.narutodb.presentation.bookmarks.DefaultBookmarksComponent
 import com.mdubovikov.narutodb.presentation.categories.DefaultCategoriesComponent
 import com.mdubovikov.narutodb.presentation.characters.DefaultCharactersComponent
 import com.mdubovikov.narutodb.presentation.details.DefaultDetailsComponent
+import com.mdubovikov.narutodb.presentation.search.DefaultSearchComponent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -23,6 +24,7 @@ class DefaultRootComponent @AssistedInject constructor(
     private val charactersComponentFactory: DefaultCharactersComponent.Factory,
     private val detailsComponentFactory: DefaultDetailsComponent.Factory,
     private val bookmarksComponentFactory: DefaultBookmarksComponent.Factory,
+    private val searchComponentFactory: DefaultSearchComponent.Factory,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : RootComponent, ComponentContext by componentContext {
 
@@ -61,7 +63,7 @@ class DefaultRootComponent @AssistedInject constructor(
                         navigation.push(Config.Details(character))
                     },
                     onBackClicked = { navigation.pop() },
-                    onDetailsRequested = { navigation.push(Config.Details(it)) },
+                    onSearchClicked = { navigation.push(Config.Search) },
                     componentContext = componentContext
                 )
                 RootComponent.Child.Characters(component)
@@ -91,6 +93,15 @@ class DefaultRootComponent @AssistedInject constructor(
                 )
                 RootComponent.Child.Bookmarks(component)
             }
+
+            is Config.Search -> {
+                val component = searchComponentFactory.create(
+                    searchCharacter = { navigation.push(Config.Details(it)) },
+                    onBackClicked = { navigation.pop() },
+                    componentContext = componentContext
+                )
+                RootComponent.Child.Search(component)
+            }
         }
     }
 
@@ -108,6 +119,9 @@ class DefaultRootComponent @AssistedInject constructor(
 
         @Serializable
         data class Bookmarks(val category: Category) : Config
+
+        @Serializable
+        data object Search : Config
     }
 
     @AssistedFactory

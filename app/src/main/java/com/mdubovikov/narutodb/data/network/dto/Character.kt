@@ -1,7 +1,5 @@
 package com.mdubovikov.narutodb.data.network.dto
 
-import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonOccupationSerializer
-import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonPartnerSerializer
 import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonReturnEmptyObjectPersonal
 import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonReturnEmptyObjectRank
 import com.mdubovikov.narutodb.data.network.dto.common.TransformJsonStringToListSerializer
@@ -11,15 +9,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CharacterDto(
     val id: Int,
-    val name: String? = null,
+    val name: String,
     val images: List<String>? = emptyList(),
     val family: FamilyDto? = null,
     val jutsu: List<String>? = null,
     @Serializable(TransformJsonReturnEmptyObjectPersonal::class)
     val personal: PersonalDto? = null,
     @Serializable(TransformJsonReturnEmptyObjectRank::class)
-    val rank: RankDto? = null,
-    val tools: List<String>? = null
+    val rank: RankDto? = null
 )
 
 @Serializable
@@ -30,17 +27,6 @@ data class PersonalDto(
     val age: AgeDto? = null,
     val height: HeightDto? = null,
     val weight: WeightDto? = null,
-    val bloodType: String? = null,
-    @Serializable(TransformJsonStringToListSerializer::class)
-    val classification: List<String>? = null,
-    @Serializable(TransformJsonStringToListSerializer::class)
-    val affiliation: List<String>? = null,
-    @Serializable(TransformJsonOccupationSerializer::class)
-    val occupation: List<String>? = null,
-    @Serializable(TransformJsonPartnerSerializer::class)
-    val partner: List<String>? = null,
-    @Serializable(TransformJsonStringToListSerializer::class)
-    val team: List<String>? = null,
     @Serializable(TransformJsonStringToListSerializer::class)
     val clan: List<String>? = null
 )
@@ -50,7 +36,9 @@ data class AgeDto(
     @SerialName("Part I")
     val partI: String? = null,
     @SerialName("Part II")
-    val partII: String? = null
+    val partII: String? = null,
+    @SerialName("Blank Period")
+    val blankPeriod: String? = null
 )
 
 @Serializable
@@ -58,7 +46,9 @@ data class HeightDto(
     @SerialName("Part I")
     val partI: String? = null,
     @SerialName("Part II")
-    val partII: String? = null
+    val partII: String? = null,
+    @SerialName("Blank Period")
+    val blankPeriod: String? = null
 )
 
 @Serializable
@@ -66,13 +56,14 @@ data class WeightDto(
     @SerialName("Part I")
     val partI: String? = null,
     @SerialName("Part II")
-    val partII: String? = null
+    val partII: String? = null,
+    @SerialName("Blank Period")
+    val blankPeriod: String? = null
 )
 
 @Serializable
 data class RankDto(
-    val ninjaRank: NinjaRankDto? = null,
-    val ninjaRegistration: String? = null
+    val ninjaRank: NinjaRankDto? = null
 )
 
 @Serializable
@@ -80,7 +71,9 @@ data class NinjaRankDto(
     @SerialName("Part I")
     val partI: String? = null,
     @SerialName("Part II")
-    val partII: String? = null
+    val partII: String? = null,
+    @SerialName("Gaiden")
+    val gaiden: String? = null
 )
 
 @Serializable
@@ -93,11 +86,6 @@ data class FamilyDto(
     val son: String? = null,
     val wife: String? = null,
     val husband: String? = null,
-    val granddaughter: String? = null,
-    val grandfather: String? = null,
-    val spouse: String? = null,
-    @SerialName("depowered form")
-    val depoweredform: String? = null,
-    @SerialName("incarnation with the god tree")
-    val incarnationWithTheGodtree: String? = null
+    val grandmother: String? = null,
+    val grandfather: String? = null
 )

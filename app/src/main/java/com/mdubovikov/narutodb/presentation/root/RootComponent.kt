@@ -6,6 +6,7 @@ import com.mdubovikov.narutodb.presentation.bookmarks.BookmarksComponent
 import com.mdubovikov.narutodb.presentation.categories.CategoriesComponent
 import com.mdubovikov.narutodb.presentation.details.DetailsComponent
 import com.mdubovikov.narutodb.presentation.characters.CharactersComponent
+import com.mdubovikov.narutodb.presentation.search.SearchComponent
 
 interface RootComponent {
 
@@ -20,5 +21,7 @@ interface RootComponent {
         data class Details(val component: DetailsComponent) : Child
 
         data class Bookmarks(val component: BookmarksComponent) : Child
+
+        data class Search(val component: SearchComponent) : Child
     }
 }

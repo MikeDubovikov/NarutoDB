@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class Character(
     val id: Int,
     val name: String,
-    val image: String,
+    val image: String?,
     val isBookmarked: Boolean
 )

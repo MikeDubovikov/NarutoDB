@@ -6,7 +6,7 @@ import com.mdubovikov.narutodb.domain.entity.Character
 fun Character.toCharacterDbModel(): BookmarkModel = BookmarkModel(
     id = id,
     name = name,
-    image = image,
+    image = image.toString(),
     isBookmarked = isBookmarked
 )
 
