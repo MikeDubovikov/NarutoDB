@@ -9,7 +9,6 @@ import com.arkivanov.decompose.defaultComponentContext
 import com.mdubovikov.narutodb.NarutoDBApp
 import com.mdubovikov.narutodb.presentation.root.DefaultRootComponent
 import com.mdubovikov.narutodb.presentation.root.RootContent
-import com.mdubovikov.narutodb.presentation.ui.theme.NarutoDBTheme
 import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
@@ -24,9 +23,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            NarutoDBTheme {
-                RootContent(component = rootComponentFactory.create(defaultComponentContext()))
-            }
+            RootContent(component = rootComponentFactory.create(defaultComponentContext()))
         }
     }
 }

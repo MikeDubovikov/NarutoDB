@@ -7,28 +7,40 @@ import com.mdubovikov.narutodb.domain.entity.CharacterDetails
 fun CharacterDto.toCharacterDetails(): CharacterDetails = CharacterDetails(
     id = id,
     name = name,
-    images = images,
+    image = images?.lastOrNull(),
     birthdate = personal?.birthdate,
     sex = personal?.sex,
     status = personal?.status,
-    agePartI = personal?.age?.partI,
-    agePartII = personal?.age?.partII,
-    heightI = personal?.height?.partI,
-    heightII = personal?.height?.partII,
-    weightI = personal?.weight?.partI,
-    weightII = personal?.weight?.partII,
-    bloodType = personal?.bloodType,
+    age = if (!personal?.age?.blankPeriod.isNullOrEmpty()) {
+        personal?.age?.blankPeriod
+    } else if (!personal?.age?.partII.isNullOrEmpty()) {
+        personal?.age?.partII
+    } else {
+        personal?.age?.partI
+    },
+    height = if (!personal?.height?.blankPeriod.isNullOrEmpty()) {
+        personal?.height?.blankPeriod
+    } else if (!personal?.height?.partII.isNullOrEmpty()) {
+        personal?.height?.partII
+    } else {
+        personal?.height?.partI
+    },
+    weight = if (!personal?.weight?.blankPeriod.isNullOrEmpty()) {
+        personal?.weight?.blankPeriod
+    } else if (!personal?.weight?.partII.isNullOrEmpty()) {
+        personal?.weight?.partII
+    } else {
+        personal?.weight?.partI
+    },
     jutsu = jutsu,
-    classification = personal?.classification,
-    affiliation = personal?.affiliation,
-    occupation = personal?.occupation,
-    partner = personal?.partner,
     clan = personal?.clan,
-    team = personal?.team,
-    ninjaRankI = rank?.ninjaRank?.partI,
-    ninjaRankII = rank?.ninjaRank?.partII,
-    ninjaRegistration = rank?.ninjaRegistration,
-    tools = tools,
+    ninjaRank = if (!rank?.ninjaRank?.gaiden.isNullOrEmpty()) {
+        rank?.ninjaRank?.gaiden
+    } else if (!rank?.ninjaRank?.partII.isNullOrEmpty()) {
+        rank?.ninjaRank?.partII
+    } else {
+        rank?.ninjaRank?.partI
+    },
     mother = family?.mother,
     father = family?.father,
     sister = family?.sister,
@@ -37,18 +49,15 @@ fun CharacterDto.toCharacterDetails(): CharacterDetails = CharacterDetails(
     son = family?.son,
     wife = family?.wife,
     husband = family?.husband,
-    granddaughter = family?.granddaughter,
+    grandmother = family?.grandmother,
     grandfather = family?.grandfather,
-    spouse = family?.spouse,
-    depoweredform = family?.depoweredform,
-    incarnationWithTheGodtree = family?.incarnationWithTheGodtree
 )
 
 fun CharacterDto.toCharacter(): Character =
     Character(
         id = id,
-        name = name ?: "",
-        image = images?.firstOrNull() ?: "",
+        name = name,
+        image = images?.lastOrNull(),
         isBookmarked = false
     )
 
@@ -57,7 +66,7 @@ fun List<CharacterDto>.toCharactersList() = map { it.toCharacter() }
 fun CharacterDetails.toCharacter(): Character =
     Character(
         id = id,
-        name = name ?: "",
-        image = images?.firstOrNull() ?: "",
+        name = name,
+        image = image,
         isBookmarked = false
     )
