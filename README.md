@@ -20,6 +20,14 @@ NarutoDB is built with Compose, Coroutines, Flow, Decompose, MVIKotlin, Room, an
     - Repository Pattern
 - [Material 3](https://m3.material.io/components): Material 3 components.
 
+## Screenshots
+
+<div style="display: flex; width: 100%">
+<img src="https://github.com/user-attachments/assets/2665adbe-a22e-4ad1-93c2-0db2928677e1" width="31%"/>
+<img src="https://github.com/user-attachments/assets/3bb55fe2-8dbc-478e-bf9f-b0bd2f4b2cb6" width="31%"/>
+<img src="https://github.com/user-attachments/assets/8fd9f036-c60f-4f29-996c-d8dd105c5ba4" width="31%"/>
+</div>
+
 ## NarutoDB API
 
 <div>
