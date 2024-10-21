@@ -30,6 +30,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mdubovikov.narutodb.R
 import com.mdubovikov.narutodb.domain.entity.CharacterDetails
@@ -54,19 +55,19 @@ fun DetailsContent(component: DetailsComponent) {
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             when (val detailsState = state.detailsState) {
+
+                DetailsStore.State.DetailsState.Initial -> {}
+
                 DetailsStore.State.DetailsState.Error -> {
                     Error()
                 }
 
-                DetailsStore.State.DetailsState.Initial -> {
+                DetailsStore.State.DetailsState.Loading -> {
+                    Loading()
                 }
 
                 is DetailsStore.State.DetailsState.Loaded -> {
                     DetailsInfo(details = detailsState.itemDetails)
-                }
-
-                DetailsStore.State.DetailsState.Loading -> {
-                    Loading()
                 }
             }
         }
@@ -127,6 +128,15 @@ private fun Loading() {
 
 @Composable
 private fun Error() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(R.string.something_went_wrong),
+            fontSize = 16.sp
+        )
+    }
 }
 
 @Composable
@@ -157,7 +167,7 @@ private fun DetailsInfo(details: CharacterDetails) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(all = 16.dp)
+                    .padding(top = 16.dp)
             )
         }
 
