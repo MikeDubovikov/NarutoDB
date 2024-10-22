@@ -5,7 +5,7 @@ import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import com.mdubovikov.narutodb.domain.entity.Category
-import com.mdubovikov.narutodb.presentation.extension.componentScope
+import com.mdubovikov.narutodb.presentation.common.componentScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
