@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,10 +29,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import com.mdubovikov.narutodb.R
 import com.mdubovikov.narutodb.domain.entity.CharacterDetails
+import com.mdubovikov.narutodb.presentation.common.ErrorImageState
+import com.mdubovikov.narutodb.presentation.common.ErrorState
+import com.mdubovikov.narutodb.presentation.common.LoadingState
 
 @Composable
 fun DetailsContent(component: DetailsComponent) {
@@ -59,11 +60,11 @@ fun DetailsContent(component: DetailsComponent) {
                 DetailsStore.State.DetailsState.Initial -> {}
 
                 DetailsStore.State.DetailsState.Error -> {
-                    Error()
+                    ErrorState(stringResource(R.string.something_went_wrong))
                 }
 
                 DetailsStore.State.DetailsState.Loading -> {
-                    Loading()
+                    LoadingState()
                 }
 
                 is DetailsStore.State.DetailsState.Loaded -> {
@@ -115,44 +116,20 @@ private fun TopBar(
 }
 
 @Composable
-private fun Loading() {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier.align(Alignment.Center),
-            color = MaterialTheme.colorScheme.primary
-        )
-    }
-}
-
-@Composable
-private fun Error() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = stringResource(R.string.something_went_wrong),
-            fontSize = 16.sp
-        )
-    }
-}
-
-@Composable
 private fun DetailsInfo(details: CharacterDetails) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item("image") {
-            AsyncImage(
+            SubcomposeAsyncImage(
                 modifier = Modifier
                     .widthIn(max = 500.dp)
                     .fillMaxWidth()
                     .aspectRatio(1.2f)
                     .fillMaxHeight(),
                 model = details.image,
+                error = { ErrorImageState() },
                 contentDescription = stringResource(R.string.character_image)
             )
         }

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mdubovikov.narutodb.R
+import com.mdubovikov.narutodb.domain.entity.Category
 
 @Composable
 fun CategoriesContent(component: CategoriesComponent) {
@@ -46,18 +47,12 @@ fun CategoriesContent(component: CategoriesComponent) {
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             items(
-                items = state.mainChooseList,
-                key = { it.category.id }
-            ) {
-                Box { }
+                items = state.categories,
+                key = { it.id }
+            ) { category ->
                 GlowingCard(
-                    categoryItem = it,
-                    onClick = {
-                        when (it.category.id) {
-                            0 -> component.onCharactersClick(it.category)
-                            1 -> component.onBookmarksClick(it.category)
-                        }
-                    }
+                    category = category,
+                    onClick = { component.onCategoryClick(category) }
                 )
             }
         }
@@ -78,7 +73,7 @@ private fun TopBar() {
 
 @Composable
 fun GlowingCard(
-    categoryItem: CategoriesStore.State.CategoryItem,
+    category: Category,
     onClick: () -> Unit,
     modifier: Modifier = Modifier.padding(start = 16.dp, end = 16.dp),
     glowingColor: Color = MaterialTheme.colorScheme.primary,
@@ -124,7 +119,7 @@ fun GlowingCard(
         ) {
             Text(
                 modifier = Modifier.padding(bottom = 24.dp),
-                text = categoryItem.category.name,
+                text = category.name,
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
             )

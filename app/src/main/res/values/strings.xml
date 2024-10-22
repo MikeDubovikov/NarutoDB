@@ -24,4 +24,8 @@
     <string name="grandmother">Grandmother</string>
     <string name="grandfather">Grandfather</string>
     <string name="jutsu">Jutsu</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="character_not_found">Character not found</string>
+    <string name="bookmarks_is_empty">Bookmarks is empty</string>
+    <string name="error_loading_image">Error loading image</string>
 </resources>
