@@ -45,11 +45,12 @@ class DefaultRootComponent @AssistedInject constructor(
         return when (config) {
             Config.Categories -> {
                 val component = categoriesComponentFactory.create(
-                    onCharactersClicked = {
-                        navigation.push(Config.Characters(it))
-                    },
-                    onBookmarksClicked = {
-                        navigation.push(Config.Bookmarks(it))
+                    onCategoryClicked = { category ->
+                        when (category.id) {
+                            0 -> navigation.push(Config.Characters(category))
+                            1 -> navigation.push(Config.Bookmarks(category))
+                        }
+
                     },
                     componentContext = componentContext
                 )
@@ -72,9 +73,7 @@ class DefaultRootComponent @AssistedInject constructor(
             is Config.Details -> {
                 val component = detailsComponentFactory.create(
                     character = config.character,
-                    onBackClicked = {
-                        navigation.pop()
-                    },
+                    onBackClicked = { navigation.pop() },
                     componentContext = componentContext
                 )
                 RootComponent.Child.Details(component)
@@ -83,12 +82,10 @@ class DefaultRootComponent @AssistedInject constructor(
             is Config.Bookmarks -> {
                 val component = bookmarksComponentFactory.create(
                     category = config.category,
-                    onBookmarkClicked = {
-                        navigation.push(Config.Details(it))
+                    onBookmarkClicked = { character ->
+                        navigation.push(Config.Details(character))
                     },
-                    onBackClicked = {
-                        navigation.pop()
-                    },
+                    onBackClicked = { navigation.pop() },
                     componentContext = componentContext
                 )
                 RootComponent.Child.Bookmarks(component)
@@ -96,7 +93,9 @@ class DefaultRootComponent @AssistedInject constructor(
 
             is Config.Search -> {
                 val component = searchComponentFactory.create(
-                    searchCharacter = { navigation.push(Config.Details(it)) },
+                    searchCharacter = { character ->
+                        navigation.push(Config.Details(character))
+                    },
                     onBackClicked = { navigation.pop() },
                     componentContext = componentContext
                 )
@@ -107,7 +106,6 @@ class DefaultRootComponent @AssistedInject constructor(
 
     @Serializable
     sealed interface Config {
-
         @Serializable
         data object Categories : Config
 
@@ -126,7 +124,6 @@ class DefaultRootComponent @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-
         fun create(
             @Assisted("componentContext") componentContext: ComponentContext
         ): DefaultRootComponent

@@ -15,8 +15,7 @@ import kotlinx.coroutines.launch
 
 class DefaultCategoriesComponent @AssistedInject constructor(
     private val storeFactory: CategoriesStoreFactory,
-    @Assisted("onCharactersClicked") private val onCharactersClicked: (Category) -> Unit,
-    @Assisted("onBookmarksClicked") private val onBookmarksClicked: (Category) -> Unit,
+    @Assisted("onCategoryClicked") private val onCategoryClicked: (Category) -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : CategoriesComponent, ComponentContext by componentContext {
 
@@ -27,13 +26,8 @@ class DefaultCategoriesComponent @AssistedInject constructor(
         scope.launch {
             store.labels.collect {
                 when (it) {
-
-                    is CategoriesStore.Label.BookmarksClick -> {
-                        onBookmarksClicked(it.category)
-                    }
-
-                    is CategoriesStore.Label.CharactersClick -> {
-                        onCharactersClicked(it.category)
+                    is CategoriesStore.Label.CategoryClick -> {
+                        onCategoryClicked(it.category)
                     }
                 }
             }
@@ -43,20 +37,14 @@ class DefaultCategoriesComponent @AssistedInject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override val model: StateFlow<CategoriesStore.State> = store.stateFlow
 
-    override fun onCharactersClick(category: Category) {
-        store.accept(CategoriesStore.Intent.CharactersClick(category))
-    }
-
-    override fun onBookmarksClick(category: Category) {
-        store.accept(CategoriesStore.Intent.BookmarksClick(category))
+    override fun onCategoryClick(category: Category) {
+        store.accept(CategoriesStore.Intent.CategoryClick(category))
     }
 
     @AssistedFactory
     interface Factory {
-
         fun create(
-            @Assisted("onCharactersClicked") onCharactersClicked: (Category) -> Unit,
-            @Assisted("onBookmarksClicked") onBookmarksClicked: (Category) -> Unit,
+            @Assisted("onCategoryClicked") onCategoryClicked: (Category) -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext
         ): DefaultCategoriesComponent
     }

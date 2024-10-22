@@ -7,7 +7,5 @@ interface CategoriesComponent {
 
     val model: StateFlow<CategoriesStore.State>
 
-    fun onCharactersClick(category: Category)
-
-    fun onBookmarksClick(category: Category)
+    fun onCategoryClick(category: Category)
 }

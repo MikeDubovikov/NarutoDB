@@ -13,7 +13,6 @@ import com.mdubovikov.narutodb.presentation.characters.CharactersStore.Intent
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.Label
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.State
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,10 +28,15 @@ interface CharactersStore : Store<Intent, State, Label> {
     data class State(
         val category: Category,
         val selectedCharacterOption: CharacterOptions,
-        val charactersList: Flow<PagingData<Character>>,
-        val isLoading: Boolean,
-        val isError: Boolean
-    )
+        val charactersState: CharactersState
+    ) {
+        sealed interface CharactersState {
+            data object Initial : CharactersState
+            data object Loading : CharactersState
+            data object Error : CharactersState
+            data class Loaded(val charactersList: Flow<PagingData<Character>>) : CharactersState
+        }
+    }
 
     sealed interface Label {
         data object ClickBack : Label
@@ -52,9 +56,7 @@ class CharactersStoreFactory @Inject constructor(
             initialState = State(
                 category = category,
                 selectedCharacterOption = CharacterOptions.AllCharacters,
-                charactersList = emptyFlow(),
-                isLoading = false,
-                isError = false
+                charactersState = State.CharactersState.Initial
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
@@ -134,7 +136,6 @@ class CharactersStoreFactory @Inject constructor(
 
         override fun executeAction(action: Action) {
             when (action) {
-
                 Action.CharactersIsLoading -> {
                     dispatch(Msg.CharactersIsLoading)
                 }
@@ -152,9 +153,9 @@ class CharactersStoreFactory @Inject constructor(
 
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State = when (msg) {
-            Msg.CharactersIsLoading -> copy(isLoading = true)
-            Msg.CharactersIsError -> copy(isError = true)
-            is Msg.CharactersLoaded -> copy(charactersList = msg.characterList)
+            Msg.CharactersIsLoading -> copy(charactersState = State.CharactersState.Loading)
+            Msg.CharactersIsError -> copy(charactersState = State.CharactersState.Error)
+            is Msg.CharactersLoaded -> copy(charactersState = State.CharactersState.Loaded(msg.characterList))
         }
     }
 }
