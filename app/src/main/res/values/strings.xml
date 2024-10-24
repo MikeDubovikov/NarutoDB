@@ -28,4 +28,7 @@
     <string name="character_not_found">Character not found</string>
     <string name="bookmarks_is_empty">Bookmarks is empty</string>
     <string name="error_loading_image">Error loading image</string>
+    <string name="close_icon">Close icon</string>
+    <string name="search_icon">Search icon</string>
+    <string name="recent_icon">Recent icon</string>
 </resources>

@@ -6,9 +6,11 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
+import com.mdubovikov.narutodb.data.mapper.toCharacter
 import com.mdubovikov.narutodb.domain.entity.Category
 import com.mdubovikov.narutodb.domain.entity.Character
 import com.mdubovikov.narutodb.domain.usecase.GetAllCharactersUseCase
+import com.mdubovikov.narutodb.domain.usecase.GetCharacterByNameUseCase
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.Intent
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.Label
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.State
@@ -20,15 +22,19 @@ interface CharactersStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
         data object ClickBack : Intent
-        data object ClickSearch : Intent
         data class CharacterClick(val character: Character) : Intent
         data class ChangeCharacterOptions(val option: CharacterOptions) : Intent
+        data object SearchCharacter : Intent
+        data class ChangeSearchQuery(val query: String) : Intent
     }
 
     data class State(
         val category: Category,
         val selectedCharacterOption: CharacterOptions,
-        val charactersState: CharactersState
+        val charactersState: CharactersState,
+        val searchQuery: String,
+        val recentQueries: List<String>,
+        val isNotFound: Boolean
     ) {
         sealed interface CharactersState {
             data object Initial : CharactersState
@@ -40,14 +46,15 @@ interface CharactersStore : Store<Intent, State, Label> {
 
     sealed interface Label {
         data object ClickBack : Label
-        data object ClickSearch : Label
         data class CharacterClick(val character: Character) : Label
+        data class SearchCharacter(val character: Character) : Label
     }
 }
 
 class CharactersStoreFactory @Inject constructor(
     private val storeFactory: StoreFactory,
-    private val getAllCharactersUseCase: GetAllCharactersUseCase
+    private val getAllCharactersUseCase: GetAllCharactersUseCase,
+    private val getCharacterByNameUseCase: GetCharacterByNameUseCase
 ) {
 
     fun create(category: Category): CharactersStore =
@@ -56,7 +63,10 @@ class CharactersStoreFactory @Inject constructor(
             initialState = State(
                 category = category,
                 selectedCharacterOption = CharacterOptions.AllCharacters,
-                charactersState = State.CharactersState.Initial
+                charactersState = State.CharactersState.Initial,
+                searchQuery = "",
+                recentQueries = emptyList(),
+                isNotFound = false
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
@@ -73,6 +83,8 @@ class CharactersStoreFactory @Inject constructor(
         data object CharactersIsLoading : Msg
         data object CharactersIsError : Msg
         data class CharactersLoaded(val characterList: Flow<PagingData<Character>>) : Msg
+        data class ChangeSearchQuery(val query: String) : Msg
+        data object SearchNotFound : Msg
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
@@ -95,10 +107,6 @@ class CharactersStoreFactory @Inject constructor(
             when (intent) {
                 Intent.ClickBack -> {
                     publish(Label.ClickBack)
-                }
-
-                Intent.ClickSearch -> {
-                    publish(Label.ClickSearch)
                 }
 
                 is Intent.CharacterClick -> {
@@ -131,6 +139,23 @@ class CharactersStoreFactory @Inject constructor(
                         }
                     }
                 }
+
+                is Intent.ChangeSearchQuery -> {
+                    dispatch(Msg.ChangeSearchQuery(intent.query))
+                }
+
+                is Intent.SearchCharacter -> {
+                    scope.launch {
+                        try {
+                            val character =
+                                getCharacterByNameUseCase.getCharacterByName(state().searchQuery)
+                                    .toCharacter()
+                            publish(Label.SearchCharacter(character))
+                        } catch (e: Exception) {
+                            dispatch(Msg.SearchNotFound)
+                        }
+                    }
+                }
             }
         }
 
@@ -156,6 +181,8 @@ class CharactersStoreFactory @Inject constructor(
             Msg.CharactersIsLoading -> copy(charactersState = State.CharactersState.Loading)
             Msg.CharactersIsError -> copy(charactersState = State.CharactersState.Error)
             is Msg.CharactersLoaded -> copy(charactersState = State.CharactersState.Loaded(msg.characterList))
+            is Msg.ChangeSearchQuery -> copy(searchQuery = msg.query)
+            Msg.SearchNotFound -> copy(isNotFound = true)
         }
     }
 }

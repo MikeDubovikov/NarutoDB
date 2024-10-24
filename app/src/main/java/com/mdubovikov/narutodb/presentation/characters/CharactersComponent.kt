@@ -11,7 +11,9 @@ interface CharactersComponent {
 
     fun onCharacterClick(character: Character)
 
-    fun onClickSearch()
-
     fun onClickBack()
+
+    fun changeSearchQuery(query: String)
+
+    fun searchCharacter()
 }
