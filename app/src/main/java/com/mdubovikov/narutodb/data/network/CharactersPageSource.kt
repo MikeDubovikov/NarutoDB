@@ -7,6 +7,7 @@ import com.mdubovikov.narutodb.data.network.api.ApiService
 import com.mdubovikov.narutodb.domain.entity.Character
 import com.mdubovikov.narutodb.presentation.characters.CharacterOptions
 import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 class CharactersPageSource @Inject constructor(
@@ -21,55 +22,82 @@ class CharactersPageSource @Inject constructor(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Character> {
-
         val page = params.key ?: 1
         val pageSize = params.loadSize
         when (characterOptions) {
             CharacterOptions.AllCharacters -> {
-                val response = apiService.getAllCharacters(page, pageSize)
-                if (response.isSuccessful) {
+                return try {
+                    val response = apiService.getAllCharacters(page, pageSize)
                     val characters = checkNotNull(response.body()).characters.toCharactersList()
                     val nextKey = if (characters.size < pageSize) null else page + 1
                     val prevKey = if (page == 1) null else page - 1
-                    return LoadResult.Page(characters, prevKey, nextKey)
-                } else {
-                    return LoadResult.Error(HttpException(response))
+
+                    LoadResult.Page(
+                        data = characters,
+                        prevKey = prevKey,
+                        nextKey = nextKey
+                    )
+                } catch (e: IOException) {
+                    LoadResult.Error(e)
+                } catch (e: HttpException) {
+                    LoadResult.Error(e)
                 }
             }
 
             CharacterOptions.AllAkatsuki -> {
-                val response = apiService.getAllAkatsuki(page, pageSize)
-                if (response.isSuccessful) {
+                return try {
+                    val response = apiService.getAllAkatsuki(page, pageSize)
                     val characters = checkNotNull(response.body()).akatsuki.toCharactersList()
                     val nextKey = if (characters.size < pageSize) null else page + 1
                     val prevKey = if (page == 1) null else page - 1
-                    return LoadResult.Page(characters, prevKey, nextKey)
-                } else {
-                    return LoadResult.Error(HttpException(response))
+
+                    LoadResult.Page(
+                        data = characters,
+                        prevKey = prevKey,
+                        nextKey = nextKey
+                    )
+                } catch (e: IOException) {
+                    LoadResult.Error(e)
+                } catch (e: HttpException) {
+                    LoadResult.Error(e)
                 }
             }
 
             CharacterOptions.AllTailedBeasts -> {
-                val response = apiService.getAllTailedBeasts(page, pageSize)
-                if (response.isSuccessful) {
+                return try {
+                    val response = apiService.getAllTailedBeasts(page, pageSize)
                     val characters = checkNotNull(response.body()).tailedBeasts.toCharactersList()
                     val nextKey = if (characters.size < pageSize) null else page + 1
                     val prevKey = if (page == 1) null else page - 1
-                    return LoadResult.Page(characters, prevKey, nextKey)
-                } else {
-                    return LoadResult.Error(HttpException(response))
+
+                    LoadResult.Page(
+                        data = characters,
+                        prevKey = prevKey,
+                        nextKey = nextKey
+                    )
+                } catch (e: IOException) {
+                    LoadResult.Error(e)
+                } catch (e: HttpException) {
+                    LoadResult.Error(e)
                 }
             }
 
             CharacterOptions.AllKara -> {
-                val response = apiService.getAllKara(page, pageSize)
-                if (response.isSuccessful) {
+                return try {
+                    val response = apiService.getAllKara(page, pageSize)
                     val characters = checkNotNull(response.body()).kara.toCharactersList()
                     val nextKey = if (characters.size < pageSize) null else page + 1
                     val prevKey = if (page == 1) null else page - 1
-                    return LoadResult.Page(characters, prevKey, nextKey)
-                } else {
-                    return LoadResult.Error(HttpException(response))
+
+                    LoadResult.Page(
+                        data = characters,
+                        prevKey = prevKey,
+                        nextKey = nextKey
+                    )
+                } catch (e: IOException) {
+                    LoadResult.Error(e)
+                } catch (e: HttpException) {
+                    LoadResult.Error(e)
                 }
             }
         }

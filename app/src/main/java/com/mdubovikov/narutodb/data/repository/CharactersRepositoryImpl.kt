@@ -14,24 +14,43 @@ import javax.inject.Inject
 class CharactersRepositoryImpl @Inject constructor(
     private val apiService: ApiService
 ) : CharactersRepository {
-
     override suspend fun getAllCharacters(): Flow<PagingData<Character>> = Pager(
-        config = PagingConfig(pageSize = 10),
-        pagingSourceFactory = { CharactersPageSource(apiService, CharacterOptions.AllCharacters) }
+        config = PagingConfig(
+            pageSize = 10,
+            initialLoadSize = 10
+        ),
+        pagingSourceFactory = {
+            CharactersPageSource(apiService, CharacterOptions.AllCharacters)
+        }
     ).flow
 
     override suspend fun getAllAkatsuki(): Flow<PagingData<Character>> = Pager(
-        config = PagingConfig(pageSize = 10),
-        pagingSourceFactory = { CharactersPageSource(apiService, CharacterOptions.AllAkatsuki) }
+        config = PagingConfig(
+            pageSize = 10,
+            initialLoadSize = 10
+        ),
+        pagingSourceFactory = {
+            CharactersPageSource(apiService, CharacterOptions.AllAkatsuki)
+        }
     ).flow
 
     override suspend fun getAllTailedBeasts(): Flow<PagingData<Character>> = Pager(
-        config = PagingConfig(pageSize = 10),
-        pagingSourceFactory = { CharactersPageSource(apiService, CharacterOptions.AllTailedBeasts) }
+        config = PagingConfig(
+            pageSize = 10,
+            initialLoadSize = 10
+        ),
+        pagingSourceFactory = {
+            CharactersPageSource(apiService, CharacterOptions.AllTailedBeasts)
+        }
     ).flow
 
     override suspend fun getAllKara(): Flow<PagingData<Character>> = Pager(
-        config = PagingConfig(pageSize = 10),
-        pagingSourceFactory = { CharactersPageSource(apiService, CharacterOptions.AllKara) }
+        config = PagingConfig(
+            pageSize = 10,
+            initialLoadSize = 10
+        ),
+        pagingSourceFactory = {
+            CharactersPageSource(apiService, CharacterOptions.AllKara)
+        }
     ).flow
 }
