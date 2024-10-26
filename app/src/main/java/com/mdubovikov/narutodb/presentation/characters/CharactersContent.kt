@@ -46,6 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mdubovikov.narutodb.R
 import com.mdubovikov.narutodb.presentation.common.ErrorState
@@ -69,33 +70,19 @@ fun CharactersContent(component: CharactersComponent) {
             )
         }
     ) { padding ->
+        Column(
+            modifier = Modifier.padding(padding)
+        ) {
+            SegmentedButtons(component)
+            CharactersList(state, component)
+        }
+
         if (searchIsEnabled) {
             SearchCharacterBar(
                 modifier = Modifier.padding(top = 80.dp),
                 state = state,
                 component = component
             )
-        } else {
-            Column(
-                modifier = Modifier.padding(padding)
-            ) {
-                SegmentedButtons(component)
-                when (val characterState = state.charactersState) {
-                    CharactersStore.State.CharactersState.Initial -> {}
-
-                    CharactersStore.State.CharactersState.Error -> {
-                        ErrorState(stringResource(R.string.something_went_wrong))
-                    }
-
-                    CharactersStore.State.CharactersState.Loading -> {
-                        LoadingState()
-                    }
-
-                    is CharactersStore.State.CharactersState.Loaded -> {
-                        CharactersList(characterState, component)
-                    }
-                }
-            }
         }
 
         if (state.isNotFound) {
@@ -255,11 +242,27 @@ private fun SegmentedButtons(component: CharactersComponent) {
 
 @Composable
 private fun CharactersList(
-    state: CharactersStore.State.CharactersState.Loaded,
+    state: CharactersStore.State,
     component: CharactersComponent
 ) {
     val charactersList = state.charactersList.collectAsLazyPagingItems()
     val scrollableListState = rememberLazyGridState()
+
+    charactersList.apply {
+        when {
+            loadState.refresh is LoadState.Loading -> {
+                LoadingState()
+            }
+
+            loadState.refresh is LoadState.Error -> {
+                ErrorState(textError = stringResource(R.string.something_went_wrong))
+            }
+
+            loadState.append is LoadState.Error -> {
+                ErrorState(textError = stringResource(R.string.something_went_wrong))
+            }
+        }
+    }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
