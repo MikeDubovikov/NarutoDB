@@ -11,6 +11,8 @@ import com.mdubovikov.narutodb.domain.entity.Category
 import com.mdubovikov.narutodb.domain.entity.Character
 import com.mdubovikov.narutodb.domain.usecase.GetAllCharactersUseCase
 import com.mdubovikov.narutodb.domain.usecase.GetCharacterByNameUseCase
+import com.mdubovikov.narutodb.domain.usecase.GetRecentQueriesUseCase
+import com.mdubovikov.narutodb.domain.usecase.SaveQueryUseCase
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.Intent
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.Label
 import com.mdubovikov.narutodb.presentation.characters.CharactersStore.State
@@ -27,6 +29,7 @@ interface CharactersStore : Store<Intent, State, Label> {
         data class ChangeCharacterOptions(val option: CharacterOptions) : Intent
         data object SearchCharacter : Intent
         data class ChangeSearchQuery(val query: String) : Intent
+        data class SaveSearchQuery(val query: String) : Intent
     }
 
     data class State(
@@ -34,7 +37,7 @@ interface CharactersStore : Store<Intent, State, Label> {
         val charactersList: Flow<PagingData<Character>>,
         val selectedCharacterOption: CharacterOptions,
         val searchQuery: String,
-        val recentQueries: List<String>,
+        val recentQueries: Flow<List<String>>,
         val isNotFound: Boolean
     )
 
@@ -48,7 +51,9 @@ interface CharactersStore : Store<Intent, State, Label> {
 class CharactersStoreFactory @Inject constructor(
     private val storeFactory: StoreFactory,
     private val getAllCharactersUseCase: GetAllCharactersUseCase,
-    private val getCharacterByNameUseCase: GetCharacterByNameUseCase
+    private val getCharacterByNameUseCase: GetCharacterByNameUseCase,
+    private val getRecentQueriesUseCase: GetRecentQueriesUseCase,
+    private val saveQueryUseCase: SaveQueryUseCase
 ) {
 
     fun create(category: Category): CharactersStore =
@@ -59,7 +64,7 @@ class CharactersStoreFactory @Inject constructor(
                 charactersList = emptyFlow(),
                 selectedCharacterOption = CharacterOptions.AllCharacters,
                 searchQuery = "",
-                recentQueries = emptyList(),
+                recentQueries = emptyFlow(),
                 isNotFound = false
             ),
             bootstrapper = BootstrapperImpl(),
@@ -69,10 +74,12 @@ class CharactersStoreFactory @Inject constructor(
 
     private sealed interface Action {
         data class CharactersLoaded(val characterList: Flow<PagingData<Character>>) : Action
+        data class RecentQueriesLoaded(val queriesList: Flow<List<String>>) : Action
     }
 
     private sealed interface Msg {
         data class CharactersLoaded(val characterList: Flow<PagingData<Character>>) : Msg
+        data class RecentQueriesLoaded(val queriesList: Flow<List<String>>) : Msg
         data class ChangeSearchQuery(val query: String) : Msg
         data object SearchNotFound : Msg
     }
@@ -81,6 +88,10 @@ class CharactersStoreFactory @Inject constructor(
         override fun invoke() {
             scope.launch {
                 dispatch(Action.CharactersLoaded(getAllCharactersUseCase.getAllCharacters()))
+            }
+
+            scope.launch {
+                dispatch(Action.RecentQueriesLoaded(getRecentQueriesUseCase.invoke()))
             }
         }
     }
@@ -122,6 +133,12 @@ class CharactersStoreFactory @Inject constructor(
                     dispatch(Msg.ChangeSearchQuery(intent.query))
                 }
 
+                is Intent.SaveSearchQuery -> {
+                    scope.launch {
+                        saveQueryUseCase.invoke(intent.query)
+                    }
+                }
+
                 is Intent.SearchCharacter -> {
                     scope.launch {
                         try {
@@ -139,6 +156,10 @@ class CharactersStoreFactory @Inject constructor(
 
         override fun executeAction(action: Action) {
             when (action) {
+                is Action.RecentQueriesLoaded -> {
+                    dispatch(Msg.RecentQueriesLoaded(action.queriesList))
+                }
+
                 is Action.CharactersLoaded -> {
                     dispatch(Msg.CharactersLoaded(action.characterList))
                 }
@@ -149,6 +170,10 @@ class CharactersStoreFactory @Inject constructor(
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State = when (msg) {
             is Msg.CharactersLoaded -> copy(charactersList = msg.characterList)
+
+            is Msg.RecentQueriesLoaded -> {
+                copy(recentQueries = msg.queriesList)
+            }
 
             is Msg.ChangeSearchQuery -> {
                 copy(
