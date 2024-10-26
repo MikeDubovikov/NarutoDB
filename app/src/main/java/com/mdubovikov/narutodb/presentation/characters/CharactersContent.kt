@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -16,8 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,9 +41,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -55,7 +53,6 @@ import com.mdubovikov.narutodb.presentation.common.LoadingState
 
 @Composable
 fun CharactersContent(component: CharactersComponent) {
-
     val state by component.model.collectAsState()
     var searchIsEnabled by remember { mutableStateOf(false) }
 
@@ -66,7 +63,7 @@ fun CharactersContent(component: CharactersComponent) {
             TopBar(
                 categoryName = state.category.name,
                 onBackClick = { component.onClickBack() },
-                onSearchClick = { searchIsEnabled = !searchIsEnabled }
+                onSearchClick = { searchIsEnabled = searchIsEnabled.not() }
             )
         }
     ) { padding ->
@@ -134,25 +131,18 @@ fun SearchCharacterBar(
     component: CharactersComponent
 ) {
     var expanded by rememberSaveable { mutableStateOf(true) }
-    val listItems = remember {
-        mutableListOf(
-            "Aho Bird",
-            "Naruto Uzumaki"
-        )
-    }
-    Box(
-        Modifier
-            .fillMaxSize()
-            .semantics { isTraversalGroup = true }) {
+    val recentQueries = state.recentQueries
+
+    Box {
         SearchBar(
-            modifier = modifier,
+            modifier = modifier.fillMaxWidth(),
             inputField = {
                 SearchBarDefaults.InputField(
                     query = state.searchQuery,
                     onQueryChange = { component.changeSearchQuery(it) },
                     onSearch = {
                         component.searchCharacter()
-                        listItems.add(it)
+                        component.saveQuery(query = it)
                     },
                     expanded = expanded,
                     onExpandedChange = { expanded = it },
@@ -160,32 +150,38 @@ fun SearchCharacterBar(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
+                            tint = MaterialTheme.colorScheme.onBackground,
                             contentDescription = stringResource(R.string.search_icon)
                         )
                     },
                     trailingIcon = {
-                        if (expanded) {
+                        if (state.searchQuery.isNotEmpty()) {
                             Icon(
                                 modifier = Modifier.clickable {
-                                    if (state.searchQuery.isNotEmpty()) {
-                                        component.changeSearchQuery("")
-                                    }
+                                    component.changeSearchQuery("")
                                 },
-                                imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(R.string.close_icon)
+                                imageVector = Icons.Default.Clear,
+                                tint = MaterialTheme.colorScheme.onBackground,
+                                contentDescription = stringResource(R.string.clean_icon)
                             )
                         }
                     }
                 )
             },
-            expanded = expanded,
+            expanded = true,
             onExpandedChange = { expanded = it },
         ) {
-            listItems.forEach { recentItem ->
-                Row(modifier = Modifier.padding(all = 14.dp)) {
+            recentQueries.forEach { recentItem ->
+                Row(
+                    modifier = Modifier.padding(all = 14.dp)
+                ) {
                     Icon(
-                        modifier = Modifier.padding(end = 10.dp),
-                        imageVector = Icons.Default.Refresh,
+                        modifier = Modifier.padding(
+                            start = 10.dp,
+                            end = 10.dp
+                        ),
+                        painter = painterResource(R.drawable.history),
+                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         contentDescription = stringResource(R.string.recent_icon)
                     )
 
@@ -194,7 +190,21 @@ fun SearchCharacterBar(
                             component.changeSearchQuery(recentItem)
                             component.searchCharacter()
                         },
+                        color = MaterialTheme.colorScheme.onBackground,
                         text = recentItem
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Icon(
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .clickable {
+                                component.deleteQuery(recentItem)
+                            },
+                        painter = painterResource(R.drawable.remove),
+                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        contentDescription = stringResource(R.string.remove_icon)
                     )
                 }
             }
