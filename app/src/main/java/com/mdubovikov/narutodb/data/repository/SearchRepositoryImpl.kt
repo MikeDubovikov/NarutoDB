@@ -34,6 +34,14 @@ class SearchRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteQuery(query: String) {
+        dataStore.edit { preferences ->
+            val queries = preferences[recentQueriesKey]?.toMutableSet() ?: mutableSetOf()
+            queries.remove(query)
+            preferences[recentQueriesKey] = queries
+        }
+    }
+
     override suspend fun searchCharacterByName(characterName: String): CharacterDetails {
         return apiService.getCharacterByName(characterName).toCharacterDetails()
     }

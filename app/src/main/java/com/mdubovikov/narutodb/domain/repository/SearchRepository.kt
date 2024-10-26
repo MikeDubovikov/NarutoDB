@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface SearchRepository {
     val recentQueries: Flow<List<String>>
     suspend fun saveQuery(query: String)
+    suspend fun deleteQuery(query: String)
     suspend fun searchCharacterByName(characterName: String): CharacterDetails
     suspend fun searchCharacterById(characterId: Int): CharacterDetails
 }

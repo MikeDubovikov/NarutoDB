@@ -9,6 +9,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.mdubovikov.narutodb.data.mapper.toCharacter
 import com.mdubovikov.narutodb.domain.entity.Category
 import com.mdubovikov.narutodb.domain.entity.Character
+import com.mdubovikov.narutodb.domain.usecase.DeleteQueryUseCase
 import com.mdubovikov.narutodb.domain.usecase.GetAllCharactersUseCase
 import com.mdubovikov.narutodb.domain.usecase.GetCharacterByNameUseCase
 import com.mdubovikov.narutodb.domain.usecase.GetRecentQueriesUseCase
@@ -22,7 +23,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface CharactersStore : Store<Intent, State, Label> {
-
     sealed interface Intent {
         data object ClickBack : Intent
         data class CharacterClick(val character: Character) : Intent
@@ -30,6 +30,7 @@ interface CharactersStore : Store<Intent, State, Label> {
         data object SearchCharacter : Intent
         data class ChangeSearchQuery(val query: String) : Intent
         data class SaveSearchQuery(val query: String) : Intent
+        data class DeleteSearchQuery(val query: String) : Intent
     }
 
     data class State(
@@ -37,7 +38,7 @@ interface CharactersStore : Store<Intent, State, Label> {
         val charactersList: Flow<PagingData<Character>>,
         val selectedCharacterOption: CharacterOptions,
         val searchQuery: String,
-        val recentQueries: Flow<List<String>>,
+        val recentQueries: List<String>,
         val isNotFound: Boolean
     )
 
@@ -53,9 +54,9 @@ class CharactersStoreFactory @Inject constructor(
     private val getAllCharactersUseCase: GetAllCharactersUseCase,
     private val getCharacterByNameUseCase: GetCharacterByNameUseCase,
     private val getRecentQueriesUseCase: GetRecentQueriesUseCase,
-    private val saveQueryUseCase: SaveQueryUseCase
+    private val saveQueryUseCase: SaveQueryUseCase,
+    private val deleteQueryUseCase: DeleteQueryUseCase
 ) {
-
     fun create(category: Category): CharactersStore =
         object : CharactersStore, Store<Intent, State, Label> by storeFactory.create(
             name = "CharactersStore",
@@ -64,7 +65,7 @@ class CharactersStoreFactory @Inject constructor(
                 charactersList = emptyFlow(),
                 selectedCharacterOption = CharacterOptions.AllCharacters,
                 searchQuery = "",
-                recentQueries = emptyFlow(),
+                recentQueries = emptyList(),
                 isNotFound = false
             ),
             bootstrapper = BootstrapperImpl(),
@@ -74,12 +75,12 @@ class CharactersStoreFactory @Inject constructor(
 
     private sealed interface Action {
         data class CharactersLoaded(val characterList: Flow<PagingData<Character>>) : Action
-        data class RecentQueriesLoaded(val queriesList: Flow<List<String>>) : Action
+        data class RecentQueriesLoaded(val queriesList: List<String>) : Action
     }
 
     private sealed interface Msg {
         data class CharactersLoaded(val characterList: Flow<PagingData<Character>>) : Msg
-        data class RecentQueriesLoaded(val queriesList: Flow<List<String>>) : Msg
+        data class RecentQueriesLoaded(val queriesList: List<String>) : Msg
         data class ChangeSearchQuery(val query: String) : Msg
         data object SearchNotFound : Msg
     }
@@ -91,7 +92,9 @@ class CharactersStoreFactory @Inject constructor(
             }
 
             scope.launch {
-                dispatch(Action.RecentQueriesLoaded(getRecentQueriesUseCase.invoke()))
+                getRecentQueriesUseCase.invoke().collect {
+                    dispatch(Action.RecentQueriesLoaded(it))
+                }
             }
         }
     }
@@ -139,6 +142,12 @@ class CharactersStoreFactory @Inject constructor(
                     }
                 }
 
+                is Intent.DeleteSearchQuery -> {
+                    scope.launch {
+                        deleteQueryUseCase.invoke(intent.query)
+                    }
+                }
+
                 is Intent.SearchCharacter -> {
                     scope.launch {
                         try {
@@ -169,7 +178,9 @@ class CharactersStoreFactory @Inject constructor(
 
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State = when (msg) {
-            is Msg.CharactersLoaded -> copy(charactersList = msg.characterList)
+            is Msg.CharactersLoaded -> {
+                copy(charactersList = msg.characterList)
+            }
 
             is Msg.RecentQueriesLoaded -> {
                 copy(recentQueries = msg.queriesList)

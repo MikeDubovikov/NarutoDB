@@ -65,13 +65,20 @@ class DefaultCharactersComponent @AssistedInject constructor(
         store.accept(CharactersStore.Intent.ChangeSearchQuery(query))
     }
 
+    override fun saveQuery(query: String) {
+        store.accept(CharactersStore.Intent.SaveSearchQuery(query))
+    }
+
+    override fun deleteQuery(query: String) {
+        store.accept(CharactersStore.Intent.DeleteSearchQuery(query))
+    }
+
     override fun searchCharacter() {
         store.accept(CharactersStore.Intent.SearchCharacter)
     }
 
     @AssistedFactory
     interface Factory {
-
         fun create(
             @Assisted("category") category: Category,
             @Assisted("onCharacterClicked") onCharacterClicked: (Character) -> Unit,
