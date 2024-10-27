@@ -1,6 +1,12 @@
 package com.mdubovikov.narutodb.presentation.characters
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -74,9 +80,13 @@ fun CharactersContent(component: CharactersComponent) {
             CharactersList(state, component)
         }
 
-        if (searchIsEnabled) {
+        AnimatedVisibility(
+            visible = searchIsEnabled,
+            enter = fadeIn(animationSpec = tween(durationMillis = 300)) + expandVertically(),
+            exit = fadeOut(animationSpec = tween(durationMillis = 300)) + shrinkVertically()
+        ) {
             SearchCharacterBar(
-                modifier = Modifier.padding(top = 80.dp),
+                modifier = Modifier.padding(top = 60.dp),
                 state = state,
                 component = component
             )
