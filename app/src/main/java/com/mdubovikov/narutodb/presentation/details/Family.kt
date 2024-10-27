@@ -22,18 +22,17 @@ import com.mdubovikov.narutodb.domain.entity.CharacterDetails
 
 @Composable
 fun Family(
+    modifier: Modifier = Modifier,
     details: CharacterDetails
 ) {
     Text(
-        modifier = Modifier.padding(top = 16.dp),
+        modifier = modifier.padding(top = 16.dp),
         text = stringResource(R.string.family),
         fontSize = 24.sp
     )
 
     Column(
-        modifier = Modifier
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-            .clip(MaterialTheme.shapes.large)
+        modifier = modifier.clip(MaterialTheme.shapes.large)
     ) {
         BlockInfoFamily(
             textInfo = stringResource(R.string.mother),

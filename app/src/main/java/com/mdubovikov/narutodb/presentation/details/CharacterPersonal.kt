@@ -23,12 +23,11 @@ import com.mdubovikov.narutodb.domain.entity.CharacterDetails
 
 @Composable
 fun CharacterPersonal(
+    modifier: Modifier = Modifier,
     details: CharacterDetails
 ) {
     Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .clip(MaterialTheme.shapes.large)
+        modifier = modifier.clip(MaterialTheme.shapes.large)
     ) {
         BlockInfoPersonal(
             detailsInfoFirst = if (!details.birthdate.isNullOrEmpty()) {

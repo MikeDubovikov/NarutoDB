@@ -1,6 +1,8 @@
 package com.mdubovikov.narutodb.presentation.details
 
+import android.graphics.Paint
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -23,11 +26,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.mdubovikov.narutodb.R
@@ -38,7 +48,6 @@ import com.mdubovikov.narutodb.presentation.common.LoadingState
 
 @Composable
 fun DetailsContent(component: DetailsComponent) {
-
     val state by component.model.collectAsState()
 
     Scaffold(
@@ -56,7 +65,6 @@ fun DetailsContent(component: DetailsComponent) {
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             when (val detailsState = state.detailsState) {
-
                 DetailsStore.State.DetailsState.Initial -> {}
 
                 DetailsStore.State.DetailsState.Error -> {
@@ -127,14 +135,66 @@ private fun DetailsInfo(details: CharacterDetails) {
                     .widthIn(max = 500.dp)
                     .fillMaxWidth()
                     .aspectRatio(1.2f)
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .padding(8.dp)
+                    .clip(shape = RoundedCornerShape(40.dp)),
                 model = details.image,
+                contentScale = ContentScale.Crop,
                 error = { ErrorImageState() },
                 contentDescription = stringResource(R.string.character_image)
             )
         }
 
-        item("name") {
+        item("detailCard") {
+            DetailsGlowingCard(details)
+        }
+    }
+}
+
+@Composable
+private fun DetailsGlowingCard(
+    details: CharacterDetails,
+    modifier: Modifier = Modifier.padding(
+        top = 24.dp,
+        start = 8.dp,
+        end = 8.dp,
+        bottom = 8.dp
+    ),
+    glowingColor: Color = MaterialTheme.colorScheme.primary,
+    containerColor: Color = MaterialTheme.colorScheme.background,
+    cornersRadius: Dp = 20.dp,
+    glowingRadius: Dp = 10.dp,
+    xShifting: Dp = 0.dp,
+    yShifting: Dp = 0.dp
+) {
+    Box(
+        modifier = modifier
+            .drawBehind {
+                val canvasSize = size
+                drawContext.canvas.nativeCanvas.apply {
+                    drawRoundRect(
+                        0f,
+                        0f,
+                        canvasSize.width,
+                        canvasSize.height,
+                        cornersRadius.toPx(),
+                        cornersRadius.toPx(),
+                        Paint().apply {
+                            color = containerColor.toArgb()
+                            isAntiAlias = true
+                            setShadowLayer(
+                                glowingRadius.toPx(),
+                                xShifting.toPx(), yShifting.toPx(),
+                                glowingColor.copy(alpha = 0.85f).toArgb()
+                            )
+                        }
+                    )
+                }
+            }
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
             Text(
                 text = details.name,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -146,19 +206,30 @@ private fun DetailsInfo(details: CharacterDetails) {
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             )
-        }
 
-        item("personal") {
-            CharacterPersonal(details)
-        }
+            CharacterPersonal(
+                modifier = Modifier.padding(8.dp),
+                details = details
+            )
 
-        item("family") {
-            Family(details)
-        }
+            Family(
+                modifier = Modifier.padding(
+                    start = 8.dp,
+                    end = 8.dp,
+                    bottom = 8.dp
+                ),
+                details = details
+            )
 
-        item("jutsu") {
-            val isAvailable = details.jutsu?.size == null
-            Jutsu(isAvailable, details)
+            Jutsu(
+                modifier = Modifier.padding(
+                    start = 8.dp,
+                    end = 8.dp,
+                    bottom = 8.dp
+                ),
+                isAvailableList = details.jutsu?.size != null,
+                details = details
+            )
         }
     }
 }
