@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -140,8 +139,8 @@ fun SearchCharacterBar(
     state: CharactersStore.State,
     component: CharactersComponent
 ) {
-    var expanded by rememberSaveable { mutableStateOf(true) }
-    val recentQueries = state.recentQueries
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val recentQueries = state.recentQueries.reversed()
 
     Box {
         SearchBar(
@@ -178,7 +177,7 @@ fun SearchCharacterBar(
                     }
                 )
             },
-            expanded = true,
+            expanded = expanded,
             onExpandedChange = { expanded = it },
         ) {
             recentQueries.forEach { recentItem ->
@@ -233,7 +232,6 @@ private fun NotFound() {
 
 @Composable
 private fun SegmentedButtons(component: CharactersComponent) {
-
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val options = listOf("All", "Akatsuki", "Beasts", "Kara")
 
@@ -289,7 +287,7 @@ private fun CharactersList(
         state = scrollableListState,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(8.dp)) }
+        item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier) }
         items(charactersList.itemCount) { item ->
             charactersList[item]?.let {
                 GlowingCard(
@@ -298,6 +296,6 @@ private fun CharactersList(
                 )
             }
         }
-        item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(8.dp)) }
+        item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier) }
     }
 }

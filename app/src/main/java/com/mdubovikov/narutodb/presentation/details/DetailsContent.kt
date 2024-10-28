@@ -55,7 +55,7 @@ fun DetailsContent(component: DetailsComponent) {
         contentColor = MaterialTheme.colorScheme.onBackground,
         topBar = {
             TopBar(
-                cityName = state.character.name,
+                characterName = state.character.name,
                 isCityFavourite = state.isBookmarked,
                 onBackClick = { component.onClickBack() },
                 onClickChangeFavouriteStatus = { component.onClickChangeBookmarkStatus() }
@@ -86,13 +86,13 @@ fun DetailsContent(component: DetailsComponent) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
-    cityName: String,
+    characterName: String,
     isCityFavourite: Boolean,
     onBackClick: () -> Unit,
     onClickChangeFavouriteStatus: () -> Unit
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(text = cityName) },
+        title = { Text(text = characterName) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
             titleContentColor = MaterialTheme.colorScheme.primary
