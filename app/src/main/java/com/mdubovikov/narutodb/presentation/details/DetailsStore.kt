@@ -19,9 +19,7 @@ import javax.inject.Inject
 interface DetailsStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
-
         data object ClickBack : Intent
-
         data object ClickChangeBookmarkStatus : Intent
     }
 
@@ -31,19 +29,14 @@ interface DetailsStore : Store<Intent, State, Label> {
         val detailsState: DetailsState
     ) {
         sealed interface DetailsState {
-
             data object Initial : DetailsState
-
             data object Loading : DetailsState
-
             data object Error : DetailsState
-
             data class Loaded(val itemDetails: CharacterDetails) : DetailsState
         }
     }
 
     sealed interface Label {
-
         data object ClickBack : Label
     }
 }
@@ -69,24 +62,16 @@ class DetailsStoreFactory @Inject constructor(
         ) {}
 
     private sealed interface Action {
-
         data object DetailsLoading : Action
-
         data object DetailsError : Action
-
         data class DetailsLoaded(val itemDetails: CharacterDetails) : Action
-
         data class BookmarkStatusChanged(val isBookmarked: Boolean) : Action
     }
 
     private sealed interface Msg {
-
         data object DetailsLoading : Msg
-
         data object DetailsError : Msg
-
         data class DetailsLoaded(val itemDetails: CharacterDetails) : Msg
-
         data class BookmarkStatusChanged(val isBookmarked: Boolean) : Msg
     }
 
@@ -159,20 +144,20 @@ class DetailsStoreFactory @Inject constructor(
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State = when (msg) {
 
-            is Msg.BookmarkStatusChanged -> {
-                copy(isBookmarked = msg.isBookmarked)
-            }
-
-            is Msg.DetailsLoaded -> {
-                copy(detailsState = State.DetailsState.Loaded(msg.itemDetails))
+            Msg.DetailsLoading -> {
+                copy(detailsState = State.DetailsState.Loading)
             }
 
             Msg.DetailsError -> {
                 copy(detailsState = State.DetailsState.Error)
             }
 
-            Msg.DetailsLoading -> {
-                copy(detailsState = State.DetailsState.Loading)
+            is Msg.DetailsLoaded -> {
+                copy(detailsState = State.DetailsState.Loaded(msg.itemDetails))
+            }
+
+            is Msg.BookmarkStatusChanged -> {
+                copy(isBookmarked = msg.isBookmarked)
             }
         }
     }

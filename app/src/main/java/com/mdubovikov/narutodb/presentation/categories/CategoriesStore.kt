@@ -16,25 +16,15 @@ import javax.inject.Inject
 interface CategoriesStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
-
-        data class CharactersClick(val category: Category) : Intent
-
-        data class BookmarksClick(val category: Category) : Intent
+        data class CategoryClick(val category: Category) : Intent
     }
 
     data class State(
-        val mainChooseList: List<CategoryItem>
-    ) {
-        data class CategoryItem(
-            val category: Category
-        )
-    }
+        val categories: List<Category>
+    )
 
     sealed interface Label {
-
-        data class CharactersClick(val category: Category) : Label
-
-        data class BookmarksClick(val category: Category) : Label
+        data class CategoryClick(val category: Category) : Label
     }
 }
 
@@ -53,12 +43,10 @@ class CategoriesStoreFactory @Inject constructor(
         ) {}
 
     private sealed interface Action {
-
         data class CategoriesLoaded(val categories: List<Category>) : Action
     }
 
     private sealed interface Msg {
-
         data class CategoriesLoaded(val categories: List<Category>) : Msg
     }
 
@@ -73,20 +61,14 @@ class CategoriesStoreFactory @Inject constructor(
     private class ExecutorImpl : CoroutineExecutor<Intent, Action, State, Msg, Label>() {
         override fun executeIntent(intent: Intent) {
             when (intent) {
-
-                is Intent.CharactersClick -> {
-                    publish(Label.CharactersClick(intent.category))
-                }
-
-                is Intent.BookmarksClick -> {
-                    publish(Label.BookmarksClick(intent.category))
+                is Intent.CategoryClick -> {
+                    publish(Label.CategoryClick(intent.category))
                 }
             }
         }
 
         override fun executeAction(action: Action) {
             when (action) {
-
                 is Action.CategoriesLoaded -> {
                     dispatch(Msg.CategoriesLoaded(action.categories))
                 }
@@ -96,12 +78,7 @@ class CategoriesStoreFactory @Inject constructor(
 
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State = when (msg) {
-
-            is Msg.CategoriesLoaded -> {
-                copy(mainChooseList = msg.categories.map {
-                    State.CategoryItem(it)
-                })
-            }
+            is Msg.CategoriesLoaded -> copy(categories = msg.categories)
         }
     }
 }

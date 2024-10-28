@@ -1,32 +1,36 @@
 package com.mdubovikov.narutodb.presentation.characters
 
-import android.graphics.Paint
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -36,34 +40,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.mdubovikov.narutodb.R
-import com.mdubovikov.narutodb.domain.entity.Character
+import com.mdubovikov.narutodb.presentation.common.ErrorState
+import com.mdubovikov.narutodb.presentation.common.GlowingCard
+import com.mdubovikov.narutodb.presentation.common.LoadingState
 
 @Composable
 fun CharactersContent(component: CharactersComponent) {
-
     val state by component.model.collectAsState()
-    val charactersList = state.charactersList.collectAsLazyPagingItems()
+    var searchIsEnabled by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -72,35 +68,31 @@ fun CharactersContent(component: CharactersComponent) {
             TopBar(
                 categoryName = state.category.name,
                 onBackClick = { component.onClickBack() },
-                onSearchClick = { component.onClickSearch() }
+                onSearchClick = { searchIsEnabled = searchIsEnabled.not() }
             )
         }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier.padding(padding)
         ) {
-            Column {
+            SegmentedButtons(component)
+            CharactersList(state, component)
+        }
 
-                val scrollableListState = rememberLazyGridState()
+        AnimatedVisibility(
+            visible = searchIsEnabled,
+            enter = fadeIn(animationSpec = tween(durationMillis = 300)) + expandVertically(),
+            exit = fadeOut(animationSpec = tween(durationMillis = 300)) + shrinkVertically()
+        ) {
+            SearchCharacterBar(
+                modifier = Modifier.padding(top = 60.dp),
+                state = state,
+                component = component
+            )
+        }
 
-                SegmentedButtons(component)
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    state = scrollableListState,
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                    item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(8.dp)) }
-                    items(charactersList.itemCount) { item ->
-                        charactersList[item]?.let {
-                            GlowingCard(
-                                character = it,
-                                onClick = { component.onCharacterClick(it) }
-                            )
-                        }
-                    }
-                    item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(8.dp)) }
-                }
-            }
+        if (state.isNotFound) {
+            NotFound()
         }
     }
 }
@@ -132,7 +124,7 @@ private fun TopBar(
                 val icon = Icons.Filled.Search
                 Icon(
                     imageVector = icon,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.search),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -140,13 +132,112 @@ private fun TopBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchCharacterBar(
+    modifier: Modifier = Modifier,
+    state: CharactersStore.State,
+    component: CharactersComponent
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val recentQueries = state.recentQueries.reversed()
+
+    Box {
+        SearchBar(
+            modifier = modifier.fillMaxWidth(),
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = state.searchQuery,
+                    onQueryChange = { component.changeSearchQuery(it) },
+                    onSearch = {
+                        component.searchCharacter()
+                        component.saveQuery(query = it)
+                    },
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    placeholder = { Text(text = stringResource(R.string.search)) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            tint = MaterialTheme.colorScheme.onBackground,
+                            contentDescription = stringResource(R.string.search_icon)
+                        )
+                    },
+                    trailingIcon = {
+                        if (state.searchQuery.isNotEmpty()) {
+                            Icon(
+                                modifier = Modifier.clickable {
+                                    component.changeSearchQuery("")
+                                },
+                                imageVector = Icons.Default.Clear,
+                                tint = MaterialTheme.colorScheme.onBackground,
+                                contentDescription = stringResource(R.string.clean_icon)
+                            )
+                        }
+                    }
+                )
+            },
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+        ) {
+            recentQueries.forEach { recentItem ->
+                Row(
+                    modifier = Modifier.padding(all = 14.dp)
+                ) {
+                    Icon(
+                        modifier = Modifier.padding(
+                            start = 10.dp,
+                            end = 10.dp
+                        ),
+                        painter = painterResource(R.drawable.history),
+                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        contentDescription = stringResource(R.string.recent_icon)
+                    )
+
+                    Text(
+                        modifier = Modifier.clickable {
+                            component.changeSearchQuery(recentItem)
+                            component.searchCharacter()
+                        },
+                        color = MaterialTheme.colorScheme.onBackground,
+                        text = recentItem
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Icon(
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .clickable {
+                                component.deleteQuery(recentItem)
+                            },
+                        painter = painterResource(R.drawable.remove),
+                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        contentDescription = stringResource(R.string.remove_icon)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotFound() {
+    Toast.makeText(
+        LocalContext.current,
+        stringResource(R.string.character_not_found),
+        Toast.LENGTH_LONG
+    ).show()
+}
+
 @Composable
 private fun SegmentedButtons(component: CharactersComponent) {
-
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val options = listOf("All", "Akatsuki", "Beasts", "Kara")
 
-    SingleChoiceSegmentedButtonRow {
+    SingleChoiceSegmentedButtonRow(
+        modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+    ) {
         options.forEachIndexed { index, label ->
             SegmentedButton(
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
@@ -168,113 +259,43 @@ private fun SegmentedButtons(component: CharactersComponent) {
 }
 
 @Composable
-private fun Loading() {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier.align(Alignment.Center),
-            color = MaterialTheme.colorScheme.primary
-        )
-    }
-}
-
-@Composable
-private fun Error() {
-    Box(modifier = Modifier.size(50.dp)) {
-        Text("Error")
-    }
-}
-
-@Composable
-fun GlowingCard(
-    character: Character,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-    glowingColor: Color = MaterialTheme.colorScheme.primary,
-    containerColor: Color = MaterialTheme.colorScheme.background,
-    cornersRadius: Dp = 40.dp,
-    glowingRadius: Dp = 10.dp,
-    xShifting: Dp = 0.dp,
-    yShifting: Dp = 0.dp
+private fun CharactersList(
+    state: CharactersStore.State,
+    component: CharactersComponent
 ) {
-    Box(
-        modifier = modifier
-            .drawBehind {
-                val canvasSize = size
-                drawContext.canvas.nativeCanvas.apply {
-                    drawRoundRect(
-                        0f,
-                        0f,
-                        canvasSize.width,
-                        canvasSize.height,
-                        cornersRadius.toPx(),
-                        cornersRadius.toPx(),
-                        Paint().apply {
-                            color = containerColor.toArgb()
-                            isAntiAlias = true
-                            setShadowLayer(
-                                glowingRadius.toPx(),
-                                xShifting.toPx(), yShifting.toPx(),
-                                glowingColor.copy(alpha = 0.85f).toArgb()
-                            )
-                        }
-                    )
-                }
+    val charactersList = state.charactersList.collectAsLazyPagingItems()
+    val scrollableListState = rememberLazyGridState()
+
+    charactersList.apply {
+        when {
+            loadState.refresh is LoadState.Loading -> {
+                LoadingState()
             }
+
+            loadState.refresh is LoadState.Error -> {
+                ErrorState(textError = stringResource(R.string.something_went_wrong))
+            }
+
+            loadState.append is LoadState.Error -> {
+                ErrorState(textError = stringResource(R.string.something_went_wrong))
+            }
+        }
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        state = scrollableListState,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { onClick() }
-        ) {
-            Box(
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(176.dp)
-                        .padding(1.dp)
-                        .clip(
-                            shape = RoundedCornerShape(40.dp).copy(
-                                bottomStart = CornerSize(0),
-                                bottomEnd = CornerSize(0)
-                            )
-                        ),
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(
-                            character.image?.ifEmpty {
-                                if (isSystemInDarkTheme()) {
-                                    R.drawable.naruto_logo_dark
-                                } else {
-                                    R.drawable.naruto_logo_light
-                                }
-                            }
-                        )
-                        .crossfade(true)
-                        .build(),
-                    contentScale = ContentScale.Crop,
-                    filterQuality = FilterQuality.None,
-                    placeholder = if (isSystemInDarkTheme()) {
-                        painterResource(R.drawable.naruto_logo_dark)
-                    } else {
-                        painterResource(R.drawable.naruto_logo_light)
-                    },
-                    contentDescription = stringResource(R.string.character_image)
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .size(width = 180.dp, height = 80.dp)
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = character.name,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+        item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier) }
+        items(charactersList.itemCount) { item ->
+            charactersList[item]?.let {
+                GlowingCard(
+                    character = it,
+                    onClick = { component.onCharacterClick(it) }
                 )
             }
         }
+        item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier) }
     }
 }

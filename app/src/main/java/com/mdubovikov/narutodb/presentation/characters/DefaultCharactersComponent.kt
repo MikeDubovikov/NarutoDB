@@ -6,7 +6,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import com.mdubovikov.narutodb.domain.entity.Category
 import com.mdubovikov.narutodb.domain.entity.Character
-import com.mdubovikov.narutodb.presentation.extension.componentScope
+import com.mdubovikov.narutodb.presentation.common.componentScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -19,7 +19,7 @@ class DefaultCharactersComponent @AssistedInject constructor(
     @Assisted("category") private val category: Category,
     @Assisted("onCharacterClicked") private val onCharacterClicked: (Character) -> Unit,
     @Assisted("onBackClicked") private val onBackClicked: () -> Unit,
-    @Assisted("onSearchClicked") private val onSearchClicked: () -> Unit,
+    @Assisted("onSearchClicked") private val onSearchClicked: (Character) -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : CharactersComponent, ComponentContext by componentContext {
 
@@ -34,12 +34,12 @@ class DefaultCharactersComponent @AssistedInject constructor(
                         onBackClicked()
                     }
 
-                    CharactersStore.Label.ClickSearch -> {
-                        onSearchClicked()
-                    }
-
                     is CharactersStore.Label.CharacterClick -> {
                         onCharacterClicked(it.character)
+                    }
+
+                    is CharactersStore.Label.SearchCharacter -> {
+                        onSearchClicked(it.character)
                     }
                 }
             }
@@ -61,18 +61,29 @@ class DefaultCharactersComponent @AssistedInject constructor(
         store.accept(CharactersStore.Intent.ClickBack)
     }
 
-    override fun onClickSearch() {
-        store.accept(CharactersStore.Intent.ClickSearch)
+    override fun changeSearchQuery(query: String) {
+        store.accept(CharactersStore.Intent.ChangeSearchQuery(query))
+    }
+
+    override fun saveQuery(query: String) {
+        store.accept(CharactersStore.Intent.SaveSearchQuery(query))
+    }
+
+    override fun deleteQuery(query: String) {
+        store.accept(CharactersStore.Intent.DeleteSearchQuery(query))
+    }
+
+    override fun searchCharacter() {
+        store.accept(CharactersStore.Intent.SearchCharacter)
     }
 
     @AssistedFactory
     interface Factory {
-
         fun create(
             @Assisted("category") category: Category,
             @Assisted("onCharacterClicked") onCharacterClicked: (Character) -> Unit,
             @Assisted("onBackClicked") onBackClicked: () -> Unit,
-            @Assisted("onSearchClicked") onSearchClicked: () -> Unit,
+            @Assisted("onSearchClicked") onSearchClicked: (Character) -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext
         ): DefaultCharactersComponent
     }

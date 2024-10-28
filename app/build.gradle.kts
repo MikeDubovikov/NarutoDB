@@ -53,7 +53,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -74,11 +73,12 @@ dependencies {
     implementation(libs.retrofit.converter)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.paging)
+    implementation(libs.paging.compose)
     implementation(libs.coil.compose)
     implementation(libs.room.core)
     ksp(libs.room.compiler)
     implementation(libs.serialization.json)
-    implementation(libs.datastore)
+    implementation(libs.datastore.preferences)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

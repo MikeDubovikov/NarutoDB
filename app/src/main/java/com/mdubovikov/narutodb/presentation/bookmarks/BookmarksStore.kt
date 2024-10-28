@@ -17,25 +17,23 @@ import javax.inject.Inject
 interface BookmarksStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
-
         data object ClickBack : Intent
-
         data class BookmarkClick(val character: Character) : Intent
     }
 
     data class State(
         val category: Category,
-        val bookmarkCharacters: List<BookmarkCharacter>
+        val bookmarkState: BookmarkState
     ) {
-        data class BookmarkCharacter(
-            val bookmarkCharacter: Character
-        )
+        sealed interface BookmarkState {
+            data object Initial : BookmarkState
+            data object Empty : BookmarkState
+            data class Loaded(val bookmarkCharacters: List<Character>) : BookmarkState
+        }
     }
 
     sealed interface Label {
-
         data object ClickBack : Label
-
         data class BookmarkClick(val character: Character) : Label
     }
 }
@@ -50,7 +48,7 @@ class BookmarksStoreFactory @Inject constructor(
             name = "BookmarksStore",
             initialState = State(
                 category = category,
-                bookmarkCharacters = listOf()
+                bookmarkState = State.BookmarkState.Initial
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
@@ -58,20 +56,24 @@ class BookmarksStoreFactory @Inject constructor(
         ) {}
 
     private sealed interface Action {
-
+        data object BookmarksEmpty : Action
         data class BookmarksLoaded(val bookmarks: List<Character>) : Action
     }
 
     private sealed interface Msg {
-
+        data object BookmarksEmpty : Msg
         data class BookmarksLoaded(val bookmarks: List<Character>) : Msg
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
         override fun invoke() {
             scope.launch {
-                getBookmarksUseCase().collect {
-                    dispatch(Action.BookmarksLoaded(bookmarks = it))
+                getBookmarksUseCase().collect { list ->
+                    if (list.isEmpty()) {
+                        dispatch(Action.BookmarksEmpty)
+                    } else {
+                        dispatch(Action.BookmarksLoaded(bookmarks = list))
+                    }
                 }
             }
         }
@@ -80,7 +82,6 @@ class BookmarksStoreFactory @Inject constructor(
     private class ExecutorImpl : CoroutineExecutor<Intent, Action, State, Msg, Label>() {
         override fun executeIntent(intent: Intent) {
             when (intent) {
-
                 is Intent.BookmarkClick -> {
                     publish(Label.BookmarkClick(intent.character))
                 }
@@ -93,6 +94,9 @@ class BookmarksStoreFactory @Inject constructor(
 
         override fun executeAction(action: Action) {
             when (action) {
+                Action.BookmarksEmpty -> {
+                    dispatch(Msg.BookmarksEmpty)
+                }
 
                 is Action.BookmarksLoaded -> {
                     dispatch(Msg.BookmarksLoaded(action.bookmarks))
@@ -103,12 +107,8 @@ class BookmarksStoreFactory @Inject constructor(
 
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State = when (msg) {
-
-            is Msg.BookmarksLoaded -> {
-                copy(bookmarkCharacters = msg.bookmarks.map {
-                    State.BookmarkCharacter(it)
-                })
-            }
+            Msg.BookmarksEmpty -> copy(bookmarkState = State.BookmarkState.Empty)
+            is Msg.BookmarksLoaded -> copy(bookmarkState = State.BookmarkState.Loaded(msg.bookmarks))
         }
     }
 }
