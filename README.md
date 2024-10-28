@@ -1,8 +1,6 @@
 # NarutoDB
 
 NarutoDB is built with Compose, Coroutines, Flow, Decompose, MVIKotlin, Room, and Material 3 based on MVI architecture.
-<br>
-<br>
 
 ## Libraries
 - [Kotlin](https://kotlinlang.org/) based, [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) + [Flow](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/) for asynchronous.
@@ -23,13 +21,16 @@ NarutoDB is built with Compose, Coroutines, Flow, Decompose, MVIKotlin, Room, an
 ## Screenshots
 
 <div style="display: flex; width: 100%">
-<img src="https://github.com/user-attachments/assets/2665adbe-a22e-4ad1-93c2-0db2928677e1" width="31%"/>
-<img src="https://github.com/user-attachments/assets/3bb55fe2-8dbc-478e-bf9f-b0bd2f4b2cb6" width="31%"/>
-<img src="https://github.com/user-attachments/assets/8fd9f036-c60f-4f29-996c-d8dd105c5ba4" width="31%"/>
+<img src="https://github.com/user-attachments/assets/c680d017-80eb-4d8d-8250-d853536c750b" width="24%"/>
+<img src="https://github.com/user-attachments/assets/26addaf4-11b7-4ad2-8450-2f1032487b0b" width="24%"/>
+<img src="https://github.com/user-attachments/assets/edf25449-8896-454e-803f-0f0498b1c347" width="24%"/>
+<img src="https://github.com/user-attachments/assets/91a874d7-fc56-4781-a505-fb1e60269501" width="24%"/>
 </div>
 
-## NarutoDB API
+## Video
 
-<div>
-https://narutodb.xyz/
-</div>
+https://github.com/user-attachments/assets/92f8b450-fb30-418c-a1fd-ec4192f655e5
+
+## Open API
+
+NarutoDB using the [NarutoDBApi](https://narutodb.xyz/).
